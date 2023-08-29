@@ -1,39 +1,11 @@
+#ifndef POLYNOMIALSHPC_POLYNOMIALS_HPP
+#define POLYNOMIALSHPC_POLYNOMIALS_HPP
+
 #include <vector>
 #include <random>
 #include <complex>
 #include <algorithm>
-
-template<typename T>
-bool is_zero(T a) {
-    return (a == 0);
-}
-
-template<typename T>
-bool is_one(T a) {
-    return (a == 1);
-}
-
-//specialization for doubles: very small coefficients is basically zero
-template<>
-bool is_zero(double a) {
-    return (std::abs(a) < 1.e-5);
-}
-
-template<>
-bool is_one<double>(double a) {
-    return (std::abs(a - 1.) < 1.e-5);
-}
-
-// overload for complex numbers
-template<typename T>
-bool is_one(std::complex<T> c) {
-    return is_one<T>(c.real()) && is_zero<T>(c.imag());
-}
-
-template<typename T>
-bool is_zero(std::complex<T> c) {
-    return is_zero<T>(c.real()) && is_zero<T>(c.imag());
-}
+#include "utils.hpp"
 
 template<typename T>
 class Polynomial;
@@ -75,7 +47,7 @@ template<typename T>
 class Polynomial {
 private:
     std::vector<T> coefficients;
-//  Will replace degree with template typename for flexibility
+//  Replace degree with template int typename for flexibility?
     int n;
 
 //  extend method facilitates certain operations
@@ -336,3 +308,5 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 
     return out;
 }
+
+#endif //POLYNOMIALSHPC_POLYNOMIALS_HPP
