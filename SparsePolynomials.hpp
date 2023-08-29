@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include "utils.hpp"
+#include "Polynomials.hpp"
 
 template <typename T>
 class Monomial;
@@ -91,9 +92,9 @@ public:
      */
     explicit SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients);
 
-    explicit SparsePolynomial(const std::list<std::pair<int, T>> &coefficients);
-
     explicit SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients);
+
+    explicit SparsePolynomial(const std::list<std::pair<int, T>> &coefficients);
 
     explicit SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients);
 
@@ -105,7 +106,12 @@ public:
 
     explicit SparsePolynomial(const std::unordered_map<int, T> &&coefficients);
 
-    //  Default constructors will be used, standard data types
+    /*
+     * Conversion from dense to sparse, with optional check for sparsity (more than half zeros)
+     */
+    explicit SparsePolynomial(const Polynomial<T> &P, bool check_sparsity = false);
+
+    //  Default destructor will be used, standard data types
     ~SparsePolynomial() = default;
 
     [[nodiscard]] int degree() const { return n; }
@@ -194,6 +200,36 @@ SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients) {}
 
 template <typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients) {}
+
+template <typename T>
+SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsity)
+{
+    if (check_sparsity)
+    {
+        int zeros = 0;
+        for (auto it = P.coefficients.begin(); it != P.coefficients.end(); ++it)
+        {
+            if (is_zero(*it))
+            {
+                zeros++;
+            }
+        }
+        if (zeros > P.coefficients.size() / 2)
+        {
+            throw std::invalid_argument("The polynomial is not sparse enough");
+        }
+    }
+    int index = P.coefficients.size();
+    n = index;
+    for (auto &c : P.coefficients)
+    {
+        if (!is_zero(c))
+        {
+            monomials.emplace_back(c, index);
+        }
+        index--;
+    }
+}
 
 template <typename T>
 std::ostream &operator<<(std::ostream &out, const Monomial<T> &p)
