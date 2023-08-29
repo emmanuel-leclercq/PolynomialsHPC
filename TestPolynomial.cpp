@@ -10,7 +10,11 @@ using std::vector;
 int main()
 {
     auto start = std::chrono::high_resolution_clock::now();
-    //Première partie
+    
+    /*
+    * Testing constructors
+    */
+
     Polynomial<double> q;
     cout << "Degre du polynome construit par defaut : " << q.degree() << endl;
 
@@ -36,26 +40,32 @@ int main()
     cout << "p1 : " << p1 << endl;
     cout << "p2 : " << p2 << endl;
 
-    //Deuxième partie
-    // Somme, différénce, produit
+    /*
+    * Testing basic operations
+    */
     Polynomial<int> sum = p1 + p2;
     Polynomial<int> diff = p1 - p2;
     Polynomial<int> diff2 = p2 - p1;
     Polynomial<int> prod = p1 * p2;
-    cout << "Somme : " << sum << endl;
-    cout << "Différence p1-p2 : " << diff << endl;
-    cout << "Différence p2-p1 : " << diff2 << endl;
-    cout << "Produit : " << prod << endl;
+    cout << "p1+p2 : " << sum << endl;
+    cout << "p1-p2 : " << diff << endl;
+    cout << "p2-p1 : " << diff2 << endl;
+    cout << "p1*p2 : " << prod << endl;
 
-    // Division et reste
+    // Division and remainder
     Polynomial<int> div = p1 / p2;
     Polynomial<int> reste = p1 % p2;
     cout << "Quotient : " << div << endl;
     cout << "Reste : " << reste << endl;
 
-    // Evaluation en un point
+    // functiòn evaluation
     cout << "p1(2) : " << p1(2) << endl
          << "p2(3) " << p2(3) << endl;
+
+    // Random polynomials generation
+    auto P=generate_random_polynomial(100,-50,50);
+    auto Q=generate_random_polynomial(100,-50,50);
+    cout<<"Dominant coefficient of random polynomial product: "<<(P*Q).dominant()<<endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;

@@ -144,9 +144,9 @@ public:
 
     friend Polynomial<T> operator*=<T>(const Polynomial<T> &, const Polynomial<T> &);
 
-    friend Polynomial<T> operator/=(const Polynomial<T> &, const Polynomial<T> &);
+    friend Polynomial<T> operator/=<T>(const Polynomial<T> &, const Polynomial<T> &);
 
-    friend Polynomial<T> operator%=(const Polynomial<T> &, const Polynomial<T> &);
+    friend Polynomial<T> operator%=<T>(const Polynomial<T> &, const Polynomial<T> &);
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
@@ -171,7 +171,7 @@ T Polynomial<T>::operator()(const U &x) {
 Polynomial<double> generate_random_polynomial(const int &n, double inf, double sup) {
     std::random_device rd;
     std::mt19937 G(rd());
-    std::uniform_int_distribution unif(inf, sup);
+    std::uniform_int_distribution<int> unif(inf, sup);
     auto gen = [&G, &unif]() { return unif(G); };
     std::vector<double> v(n + 1);
     std::generate(v.begin(), v.end(), gen);
@@ -279,12 +279,12 @@ std::pair<Polynomial<T>, Polynomial<T>> euclid_div(const Polynomial<T> &a, const
 
 template<typename T>
 Polynomial<T> operator/(const Polynomial<T> &p, const Polynomial<T> &q) {
-    return euclid_div(p, q)->first;
+    return euclid_div(p, q).first;
 };
 
 template<typename T>
 Polynomial<T> operator%(const Polynomial<T> &p, const Polynomial<T> &q) {
-    return euclid_div(p, q)->second;
+    return euclid_div(p, q).second;
 };
 
 template<typename T>
