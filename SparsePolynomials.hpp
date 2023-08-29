@@ -22,6 +22,12 @@ template <typename T>
 bool operator<(const Monomial<T> &u, const Monomial<T> &v) { return u.n < v.n; };
 
 template <typename T>
+bool operator==(const Monomial<T> &u, const Monomial<T> &v) { return u.n == v.n && u.coefficient == v.coefficient; };
+
+template <typename T>
+bool operator==(const Monomial<T> &u, const T &t) { return u.coefficient == t; };
+
+template <typename T>
 std::ostream &operator<<(std::ostream &, const Monomial<T> &);
 
 template <typename T>
@@ -41,8 +47,14 @@ public:
 
     Monomial(const T &&a, const int &m = 0) : coefficient(a), n(m) {}
 
-    //  Ordering by degree
+    /* The goal is to order by degree
+     * ! Do not auto reformat this with VSCode or erro
+     */
     friend bool operator< <>(const Monomial<T> &u, const Monomial<T> &v);
+
+    friend bool operator==<>(const Monomial<T> &u, const Monomial<T> &v);
+
+    friend bool operator==<>(const Monomial<T> &u, const T &t);
 
     friend std::ostream &operator<<<>(std::ostream &, const Monomial<T> &);
 };
@@ -102,6 +114,18 @@ public:
 
     [[nodiscard]] Monomial<T> &dominant() { return *monomials.begin(); }
 
+    void reorder()
+    {
+        monomials.sort([](Monomial<T> &P, Monomial<T> &Q)
+                       { return Q < P; });
+    }
+
+    void adjust()
+    {
+        monomials.remove_if([](const Monomial<T> &M)
+                            { return M == 0; });
+    };
+
     friend std::ostream &operator<<<>(std::ostream &, const SparsePolynomial<T> &);
 };
 
@@ -139,24 +163,27 @@ SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &coeffici
                    { return Monomial<T>(p.second, p.first); });
 }
 
+/*
+ * !Problem with the zeros
+*/
 template <typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients)
 {
     int index = coefficients.size();
-    n = index - 1;
+    n = index;
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
                    [&index](const T &p)
-                   { return Monomial<T>(p, index); });
+                   { return Monomial<T>(p, index--); });
 }
 
 template <typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients)
 {
     int index = coefficients.size();
-    n = index - 1;
+    n = index;
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
                    [&index](T &p)
-                   { return Monomial<T>(std::move(p), index); });
+                   { return Monomial<T>(std::move(p), index--); });
 }
 
 template <typename T>
@@ -171,13 +198,14 @@ SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coef
 template <typename T>
 std::ostream &operator<<(std::ostream &out, const Monomial<T> &p)
 {
-    if (is_zero(p.coefficient))
-    {
-        out << "0";
-    }
-    else if (p.n == 0)
+
+    if (p.n == 0)
     {
         out << p.coefficient;
+    }
+    else if (is_zero(p.coefficient))
+    {
+        out << "0";
     }
     else if (is_one(p.coefficient))
     {
@@ -193,9 +221,15 @@ std::ostream &operator<<(std::ostream &out, const Monomial<T> &p)
 template <typename T>
 std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P)
 {
-    for (auto &m : P.monomials)
+    for (auto it = P.monomials.begin(); it != P.monomials.end(); ++it)
     {
-        out << m << " + ";
+        out << *it;
+        if (it != P.monomials.end() && std::next(it) != P.monomials.end())
+        {
+            out << " + ";
+        }
+    }
+    {
     }
     return out;
 }
