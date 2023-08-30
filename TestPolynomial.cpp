@@ -16,7 +16,7 @@ int main()
     */
 
     Polynomial<double> q;
-    cout << "Degre du polynome construit par defaut : " << q.degree() << endl;
+    cout << "Default polynomial degree : " << q.degree() << endl;
 
     vector<int> v1{6, 3, 0, 1, 5};
     Polynomial<int> p1(v1);
