@@ -7,10 +7,8 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-int main()
-{
-    auto start = std::chrono::high_resolution_clock::now();
-    
+int main() {
+
     /*
     * Testing constructors
     */
@@ -61,13 +59,17 @@ int main()
     // functiòn evaluation
     cout << "p1(2) : " << p1(2) << endl
          << "p2(3) " << p2(3) << endl;
-
     // Random polynomials generation
-    auto P=generate_random_polynomial(100,-50,50);
-    auto Q=generate_random_polynomial(100,-50,50);
-    cout<<"Dominant coefficient of random polynomial product: "<<(P*Q).dominant()<<endl;
+    auto P = generate_random_polynomial(100, 0, 1);
+    auto Q = generate_random_polynomial(100, -50, 50);
+
+    cout << "Is random polynomial P sparse? " << P.is_sparse() << endl;
+    cout << "P: " << P << endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    cout << "Dominant coefficient of random polynomial product: " << (P * Q).dominant() << endl;
 
     auto end = std::chrono::high_resolution_clock::now();
+    cout << "time it takes for the product (and cout): ";
     cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;
 
     return 0;

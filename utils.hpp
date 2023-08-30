@@ -6,7 +6,7 @@
 template <typename T>
 bool is_zero(T a)
 {
-    return (a == 0);
+    return (static_cast<int>(a) == 0);
 }
 
 template <typename T>

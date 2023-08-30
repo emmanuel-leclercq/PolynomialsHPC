@@ -5,6 +5,7 @@
 #include <random>
 #include <complex>
 #include <algorithm>
+#include <iostream>
 #include "utils.hpp"
 
 template<typename T>
@@ -97,6 +98,8 @@ public:
 
     [[nodiscard]] T &dominant() { return coefficients[n]; }
 
+    [[nodiscard]] bool is_sparse() const;
+
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
 //  Basic operators as friend methods
@@ -123,6 +126,18 @@ public:
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
 };
+
+template<typename T>
+bool Polynomial<T>::is_sparse() const {
+    int zeros = 0;
+    for (auto c: coefficients) {
+        if (is_zero(c)) {
+            zeros++;
+        }
+    }
+    std::cout << "Number of zeros: " << zeros << std::endl;
+    return (zeros > this->degree() / 2);
+}
 
 template<typename T>
 template<typename U>

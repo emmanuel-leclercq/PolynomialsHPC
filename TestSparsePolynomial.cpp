@@ -1,6 +1,9 @@
 #include "SparsePolynomials.hpp"
+#include "Polynomials.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
+#include <unordered_map>
 
 using std::cout;
 using std::endl;
@@ -22,14 +25,41 @@ int main() {
     /*
     * testing Sparse Polynomial implementation
     */
-    cout << "constructing p1 from vector" << endl;
-    vector<int> v1{6, 3, 0, 1, 5};
-    SparsePolynomial<int> p1(v1, false);
-    cout << "p1: " << p1 << endl;
-    p1.adjust();
-    cout << "p1 adjusted: " << p1 << endl;
-    cout << "p1.degree(): " << p1.degree() << endl;
-    cout << "Dominant monomial: " << p1.dominant() << endl;
+    cout << "constructing V from vector" << endl;
+    vector<double> vector1{6.3, 3, 0, 1, 5};
+    SparsePolynomial<double> V(vector1, false);
+    cout << "V: " << V << endl;
+    V.adjust();
+    cout << "V adjusted: " << V << endl;
+    cout << "V.degree(): " << V.degree() << endl;
+    cout << "Dominant monomial: " << V.dominant() << endl;
+
+    cout << "constructing L from list<int>" << endl;
+    list<int> list1{6, 3, 0, 1, 5};
+    SparsePolynomial<int> L(list1, false);
+    cout << "L: " << L << endl;
+
+    cout << "constructing M from map<int,double>" << endl;
+    std::map<int,double> map1;
+    map1[17]=15.3;
+    map1[175]=-5;
+    map1[0]=777;
+    SparsePolynomial<double> M(map1,false);
+    cout << "M: " << M << endl;
+
+    cout << "constructing U from unordered_map<int,double>" << endl;
+    std::unordered_map<int,double> umap1;
+    map1[17]=15.3;
+
+    SparsePolynomial<double> U(umap1,false);
+    cout << "U: " << U << endl;
+
+    cout << "constructing U from Polynomial<double>" << endl;
+    Polynomial<double> poly1(vector1);
+    map1[17]=15.3;
+
+    SparsePolynomial<double> P(poly1,false);
+    cout << "U: " << U << endl;
 
     return 0;
 }
