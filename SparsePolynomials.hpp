@@ -161,7 +161,8 @@ public:
 };
 
 /*
- * ! Problem with the zeros
+ * ! Zeros are stored too, maybe we can strip them immediately here,
+ * without additional complexity?
 */
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients, bool sorted) {
@@ -180,10 +181,14 @@ SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients, bool 
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients, bool sorted) {}
+SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients, bool sorted) {
+
+}
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients, bool sorted) {}
+SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients, bool sorted) {
+
+}
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &coefficients, bool sorted) {
@@ -216,6 +221,15 @@ template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients, bool sorted) {}
 
 template<typename T>
+SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients, bool sorted) {}
+
+template<typename T>
+SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &coefficients, bool sorted) {}
+
+template<typename T>
+SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients, bool sorted) {}
+
+template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsity) {
     if (check_sparsity) {
         int zeros = 0;
@@ -237,7 +251,6 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
         index--;
     }
 }
-
 
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
