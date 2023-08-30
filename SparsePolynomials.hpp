@@ -66,6 +66,7 @@ class SparsePolynomial
 private:
     std::list<Monomial<T>> monomials;
     int n;
+    bool is_sorted=false;
 
 public:
     /*
@@ -73,7 +74,7 @@ public:
      * considering certain data types make more sense for a sparse implementation,
      * and to reduce the need for preprocessing existing variables
      */
-    SparsePolynomial() : monomials(Monomial<T>()), n(-1) {}
+    SparsePolynomial() : monomials(Monomial<T>()), n(-1), is_sorted(true) {}
 
     /*
      * Constructors assuming input is not 'sparse', which spears us
@@ -124,6 +125,7 @@ public:
     {
         monomials.sort([](Monomial<T> &P, Monomial<T> &Q)
                        { return Q < P; });
+        is_sorted = true;
     }
 
     void adjust()
