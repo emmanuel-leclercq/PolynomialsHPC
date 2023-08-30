@@ -19,9 +19,6 @@
 template<typename T>
 class Monomial;
 
-template<typename T>
-class SparsePolynomial;
-
 template<typename T, typename Y>
 bool operator<(const Monomial<T> &u, const Monomial<Y> &v) { return u.n < v.n; }
 
@@ -36,7 +33,41 @@ template<typename T>
 std::ostream &operator<<(std::ostream &, const Monomial<T> &);
 
 template<typename T>
+class SparsePolynomial;
+
+template<typename T>
 std::ostream &operator<<(std::ostream &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator+(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator*(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator/(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator%(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator+=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator-=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator*=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+template<typename T>
+SparsePolynomial<T> operator%=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
 
 /*
  * Definition of the parent class monomial and all its methods
@@ -161,6 +192,26 @@ public:
 
     friend std::ostream &operator
     <<<>(std::ostream &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator+<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator-<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator*<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator/<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator%<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator+=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator-=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator*=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator/=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    friend SparsePolynomial<T> operator%=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 };
 
 /*
@@ -304,5 +355,35 @@ std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
     }
     return out;
 }
+
+template<typename T>
+SparsePolynomial<T> operator+(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator*(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator/(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator%(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator+=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator-=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator*=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+
+template<typename T>
+SparsePolynomial<T> operator%=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
 
 #endif //POLYNOMIALSHPC_SPARSEPOLYNOMIALS_HPP

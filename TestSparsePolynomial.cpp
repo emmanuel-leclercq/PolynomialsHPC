@@ -40,26 +40,25 @@ int main() {
     cout << "L: " << L << endl;
 
     cout << "constructing M from map<int,double>" << endl;
-    std::map<int,double> map1;
-    map1[17]=15.3;
-    map1[175]=-5;
-    map1[0]=777;
-    SparsePolynomial<double> M(map1,false);
+    std::map<int, double> map1;
+    map1[17] = 15.3;
+    map1[175] = -5;
+    map1[0] = 777;
+    SparsePolynomial<double> M(map1, false);
     cout << "M: " << M << endl;
 
     cout << "constructing U from unordered_map<int,double>" << endl;
-    std::unordered_map<int,double> umap1;
-    map1[17]=15.3;
-
-    SparsePolynomial<double> U(umap1,false);
+    std::unordered_map<int, double> umap1;
+    umap1[17] = 1555.3;
+    umap1[175] = -5555;
+    umap1[0] = 777;
+    SparsePolynomial<double> U(umap1, false);
     cout << "U: " << U << endl;
 
     cout << "constructing U from Polynomial<double>" << endl;
     Polynomial<double> poly1(vector1);
-    map1[17]=15.3;
-
-    SparsePolynomial<double> P(poly1,false);
-    cout << "U: " << U << endl;
+    SparsePolynomial<double> P(poly1, false);
+    cout << "U: " << P << endl;
 
     return 0;
 }
