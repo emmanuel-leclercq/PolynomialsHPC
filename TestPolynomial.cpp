@@ -61,14 +61,22 @@ int main() {
          << "p2(3) " << p2(3) << endl;
     // Random polynomials generation
     auto P = generateRandomPolynomial(100, 0, 1);
-    auto Q = generateRandomPolynomial(100, -50, 50);
+
+    std::random_device rd;
+    std::mt19937 mt_generator(rd());
+    std::default_random_engine def_generator(rd());
+    std::normal_distribution<double> double_distribution(0.0, 1.0);
+
+    auto Q = generateRandomPolynomial<double>(30, double_distribution, def_generator);
 
     cout << "Is random polynomial P sparse? " << P.is_sparse() << endl;
     cout << "P: " << P << endl;
+    cout << "Q: " << Q << endl;
+
     auto start = std::chrono::high_resolution_clock::now();
     cout << "Dominant coefficient of random polynomial product: " << (P * Q).dominant() << endl;
-
     auto end = std::chrono::high_resolution_clock::now();
+
     cout << "time it takes for the product (and cout): ";
     cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;
 
