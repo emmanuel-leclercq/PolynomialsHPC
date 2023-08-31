@@ -61,9 +61,9 @@ int main() {
     cout << "P: " << P << endl;
 
     auto Q = generateRandomPolynomial(100, 0, 1);
-    cout << "Q: " << Q << endl;
+    cout << "Q and its degree: " << Q << ", "<<Q.degree()<<endl;
     cout << "Is Q sparse? " << Q.is_sparse() << endl;
     SparsePolynomial<double> Q_sparse(Q, true);
-    cout << "Q as sparse: " << Q << endl;
+    cout << "Q as sparse and its degree: " << Q_sparse << ", "<<Q_sparse.degree()<<endl;
     return 0;
 }

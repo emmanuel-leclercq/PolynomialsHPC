@@ -337,7 +337,7 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
     }
     int index = P.degree();
     n = index;
-    for (int i = 0; i < P.degree(); i++) {
+    for (int i = 0; i < n; i++) {
         if (!is_zero(P[i])) {
             monomials.emplace_back(P[i], index);
         }
