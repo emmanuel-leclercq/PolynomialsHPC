@@ -363,7 +363,14 @@ template<typename T>
 SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
 
 template<typename T>
-SparsePolynomial<T> operator*(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+SparsePolynomial<T> operator*(const SparsePolynomial<T> & P, const SparsePolynomial<T> & Q) {
+    if(P.is_sorted && Q.is_sorted){
+
+    }
+    else{
+
+    }
+}
 
 template<typename T>
 SparsePolynomial<T> operator/(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
