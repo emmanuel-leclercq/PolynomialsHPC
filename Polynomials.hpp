@@ -5,7 +5,6 @@
 #include <random>
 #include <complex>
 #include <algorithm>
-#include <iostream>
 #include "utils.hpp"
 
 template<typename T>
@@ -135,7 +134,6 @@ bool Polynomial<T>::is_sparse() const {
             zeros++;
         }
     }
-    std::cout << "Number of zeros: " << zeros << std::endl;
     return (zeros > this->degree() / 2);
 }
 

@@ -69,15 +69,15 @@ int main() {
 
     auto Q = generateRandomPolynomial<double>(30, double_distribution, def_generator);
 
-    cout << "Is random polynomial P sparse? " << P.is_sparse() << endl;
     cout << "P: " << P << endl;
     cout << "Q: " << Q << endl;
 
     auto start = std::chrono::high_resolution_clock::now();
-    cout << "Dominant coefficient of random polynomial product: " << (P * Q).dominant() << endl;
+    auto dom = (P * Q).dominant();
     auto end = std::chrono::high_resolution_clock::now();
+    cout << "Dominant coefficient of random polynomial product: " << dom << endl;
 
-    cout << "time it takes for the product (and cout): ";
+    cout << "time it takes for the product : ";
     cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;
 
     return 0;

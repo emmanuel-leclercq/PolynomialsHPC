@@ -58,7 +58,12 @@ int main() {
     cout << "constructing U from Polynomial<double>" << endl;
     Polynomial<double> poly1(vector1);
     SparsePolynomial<double> P(poly1, false);
-    cout << "U: " << P << endl;
+    cout << "P: " << P << endl;
 
+    auto Q = generateRandomPolynomial(100, 0, 1);
+    cout << "Q: " << Q << endl;
+    cout << "Is Q sparse? " << Q.is_sparse() << endl;
+    SparsePolynomial<double> Q_sparse(Q, true);
+    cout << "Q as sparse: " << Q << endl;
     return 0;
 }
