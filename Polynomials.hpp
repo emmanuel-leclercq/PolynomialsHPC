@@ -155,7 +155,13 @@ T Polynomial<T>::operator()(const U &x) {
     else return 0;
 }
 
-Polynomial<double> generate_random_polynomial(const int &n, double inf, double sup) {
+/*
+ * Will replace uniform int distribution with generic distribution type,
+ * and put default (null?) values pour inf and sup.
+ * Could also randomize polynomial degree, or leave it to user
+ */
+
+Polynomial<double> generateRandomPolynomial(const int &n, double inf, double sup) {
     std::random_device rd;
     std::mt19937 G(rd());
     std::uniform_int_distribution<int> unif(inf, sup);
@@ -163,6 +169,15 @@ Polynomial<double> generate_random_polynomial(const int &n, double inf, double s
     std::vector<double> v(n + 1);
     std::generate(v.begin(), v.end(), gen);
     return Polynomial<double>(v);
+}
+
+template<typename T, typename Distribution, typename Generator>
+Polynomial<T> generateRandomPolynomial(int n, Distribution &distribution, Generator &generator) {
+    std::random_device rd;
+    auto gen = [&generator, &distribution]() { return distribution(generator); };
+    std::vector<T> v(n + 1);
+    std::generate(v.begin(), v.end(), gen);
+    return Polynomial<T>(v);
 }
 
 template<typename T>

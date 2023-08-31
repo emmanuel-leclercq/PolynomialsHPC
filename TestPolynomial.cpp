@@ -60,8 +60,8 @@ int main() {
     cout << "p1(2) : " << p1(2) << endl
          << "p2(3) " << p2(3) << endl;
     // Random polynomials generation
-    auto P = generate_random_polynomial(100, 0, 1);
-    auto Q = generate_random_polynomial(100, -50, 50);
+    auto P = generateRandomPolynomial(100, 0, 1);
+    auto Q = generateRandomPolynomial(100, -50, 50);
 
     cout << "Is random polynomial P sparse? " << P.is_sparse() << endl;
     cout << "P: " << P << endl;
