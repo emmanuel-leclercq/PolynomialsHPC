@@ -103,14 +103,16 @@ public:
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const Monomial<T> &p) {
 
-    if (p.n == 0) {
+    if (p.n == 0) [[unlikely]] {
         out << p.coefficient;
     } else if (is_zero(p.coefficient)) {
         out << "0";
     } else if (is_one(p.coefficient)) {
-        out << "x^" << p.n;
+        if (p.n != 1)[[likely]] { out << "x^" << p.n; }
+        else { out << "x"; }
     } else {
-        out << p.coefficient << "x^" << p.n;
+        if (p.n != 1)[[likely]] { out << p.coefficient << "x^" << p.n; }
+        else { out << p.coefficient << "x"; }
     }
     return out;
 }
@@ -335,13 +337,11 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
             throw std::invalid_argument("The polynomial is not sparse enough");
         }
     }
-    int index = P.degree();
-    n = index;
-    for (int i = 0; i < n; i++) {
-        if (!is_zero(P[i])) {
-            monomials.emplace_back(P[i], index);
+    n = P.degree() - 1;
+    for (int index = n + 1; index > -1; index--) {
+        if (!is_zero(P[index])) {
+            monomials.emplace_back(P[index], index);
         }
-        index--;
     }
 }
 
@@ -363,11 +363,10 @@ template<typename T>
 SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
 
 template<typename T>
-SparsePolynomial<T> operator*(const SparsePolynomial<T> & P, const SparsePolynomial<T> & Q) {
-    if(P.is_sorted && Q.is_sorted){
+SparsePolynomial<T> operator*(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
+    if (P.is_sorted && Q.is_sorted) {
 
-    }
-    else{
+    } else {
 
     }
 }
