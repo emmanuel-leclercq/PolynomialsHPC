@@ -337,8 +337,8 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
             throw std::invalid_argument("The polynomial is not sparse enough");
         }
     }
-    n = P.degree() - 1;
-    for (int index = n + 1; index > -1; index--) {
+    n = P.degree();
+    for (int index = n; index > -1; index--) {
         if (!is_zero(P[index])) {
             monomials.emplace_back(P[index], index);
         }
@@ -350,7 +350,8 @@ std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
     for (auto it = P.monomials.begin(); it != P.monomials.end(); ++it) {
         out << *it;
         if (it != P.monomials.end() && std::next(it) != P.monomials.end()) {
-            out << " + ";
+            if (std::next(it)->coeff() >= 0) { out << " +"; }
+            else { out << " "; }
         }
     }
     return out;

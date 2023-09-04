@@ -35,7 +35,7 @@ int main() {
     cout << "Dominant monomial: " << V.dominant() << endl;
 
     cout << "constructing L from list<int>" << endl;
-    list<int> list1{6, 3, 0, 1, 5};
+    list<int> list1{6, -3, 0, 1, 5};
     SparsePolynomial<int> L(list1, false);
     cout << "L: " << L << endl;
 

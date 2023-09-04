@@ -326,9 +326,9 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 
             out << p.coefficients[i];
 
-            if (i > 1) { out << "*" << var << "^" << i << " "; }
-            else if (i == 1) { out << "*" << var; }
-            out << " + ";
+            if (i > 1) { out << var << "^" << i; }
+            else if (i == 1) { out << var; }
+            if(p.coefficients[i+1]>=0) { out << " +"; }
         }
     }
     if (!is_zero(p.coefficients[0]))
