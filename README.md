@@ -10,7 +10,7 @@ The adjust() method removes trailing zeros, basic accessors are provided.
 #### Operations available :
 1. addition: O(min(n,m)) implementation, we take the largest (in terms of degree) of lhs and rhs, then add the terms
 2. Subtraction: similar method to addition, but not using addition for speed
-3. Multiplication: implementation in O(n^2) for now, will try FFT for O(nlog(n))
+3. Multiplication: implementation in O(n*m) for now, will try FFT for O(nlog(n))
 4. Division: euclid algorithm
 5. Evaluation: Horner's method
 6. Factorization (TODO)

@@ -358,7 +358,19 @@ std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
 }
 
 template<typename T>
-SparsePolynomial<T> operator+(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+SparsePolynomial<T> operator+(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs) {
+    if (rhs.is_sorted && lhs.is_sorted) {
+
+    } else {
+        std::map<int, T> result;
+        auto polynomial_ref_pair = std::minmax(lhs, rhs, [](const SparsePolynomial<T> &p, SparsePolynomial<T> &q) {
+            return p.degree() < q.degree();
+        });
+        for (int i=0;i<polynomial_ref_pair.second.degree();i++){
+            result[rhs[i].degree()]
+        }
+    }
+}
 
 template<typename T>
 SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
