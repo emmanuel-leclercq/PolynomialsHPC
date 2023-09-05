@@ -14,6 +14,7 @@ int main() {
     /*
      * testing Monomial implementation
     */
+    Monomial<int> m;
     Monomial<int> m1(1, 2);
     Monomial<int> m2(1, 3);
     cout << "m1: " << m1 << endl;
@@ -21,10 +22,14 @@ int main() {
     auto zero = Monomial<int>(0);
     cout << "m1=0? " << (m1 == 0) << endl;
     cout << "monomial zero=0? " << (zero == 0) << endl;
+    cout << "default monomial: " << m << endl;
 
     /*
     * testing Sparse Polynomial implementation
     */
+    SparsePolynomial<int> basic;
+    cout << "default sparse polynomial" << basic << endl;
+
     cout << "constructing V from vector" << endl;
     vector<double> vector1{6.3, 3, 0, 1, 5};
     SparsePolynomial<double> V(vector1, false);
@@ -60,6 +65,8 @@ int main() {
     cout << "dense version: " << poly1 << endl;
     SparsePolynomial<double> P(poly1, false);
     cout << "P: " << P << endl;
+    cout << "Testing addition M+P=" << M + P << endl;
+    cout << "Testing subtraction M-P=" << M - P << endl;
 
     auto Q = generateRandomPolynomial(100, 0, 1);
     cout << "Q and its degree: " << Q << ", " << Q.degree() << endl;
