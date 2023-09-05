@@ -276,6 +276,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> 
                        n = std::max(n, p.first);
                        return Monomial<T>(p.second, p.first);
                    });
+    this->is_sorted = true;
 }
 
 template<typename T>
@@ -285,7 +286,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> 
                        n = std::max(n, p.first);
                        return Monomial<T>(std::move(p.second), p.first);
                    });
-
+    this->is_sorted = true;
     delete coefficients;
 }
 
