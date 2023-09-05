@@ -14,10 +14,16 @@
 
 template<typename T>
 class SparseTest {
-private:
-    std::map<int, T> monomials;
 public:
-    explicit SparseTest(std::map<int,T> m): monomials(m){};
+    std::map<int, T, std::greater<int>> monomials;
+
+    explicit SparseTest(std::map<int, T> m) {
+        for (auto [key, val]: m) { monomials[key] = val; }
+    };
+
+    explicit SparseTest(std::map<int, T, std::greater<int>> m) : monomials(m) {};
+
+    int degree() { return *this->begin()->first; }
 };
 
 #endif //POLYNOMIALSHPC_MAPSPARSE_HPP

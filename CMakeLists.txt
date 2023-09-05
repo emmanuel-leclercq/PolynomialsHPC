@@ -8,3 +8,4 @@ set(CMAKE_CXX_STANDARD 20)
 #add_executable(Dense TestPolynomial.cpp)
 
 add_executable(Sparse TestSparsePolynomial.cpp)
+

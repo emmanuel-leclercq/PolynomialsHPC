@@ -161,9 +161,9 @@ public:
     /* It makes more sense to use degrees as keys considering the
      * vectorial structure of polynomials spaces
      */
-    explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients);
 
-    explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients);
 
     explicit SparsePolynomial(const std::map<int, T> &coefficients, bool sorted);
 
@@ -270,7 +270,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients, bool so
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients, bool sorted) {
+SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients) {
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
                    [this](const std::pair<int, T> &p) {
                        n = std::max(n, p.first);
@@ -280,7 +280,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> 
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients, bool sorted) {
+SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients) {
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
                    [this](std::pair<int, T> &p) {
                        n = std::max(n, p.first);
@@ -297,6 +297,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &coefficients, bool
                        n = std::max(n, p.first);
                        return Monomial<T>(p.second, p.first);
                    });
+    is_sorted = sorted;
 }
 
 template<typename T>
