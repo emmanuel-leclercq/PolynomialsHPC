@@ -372,7 +372,8 @@ template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsity) {
     if (check_sparsity) {
         if (!P.is_sparse()) {
-            throw std::invalid_argument("The polynomial is not sparse enough");
+            throw std::invalid_argument(
+                    "The polynomial is not sparse enough, to force conversion set second parameter to false");
         }
     }
     n = P.degree();

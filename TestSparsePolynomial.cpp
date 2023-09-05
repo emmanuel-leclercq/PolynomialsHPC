@@ -67,6 +67,7 @@ int main() {
     cout << "P: " << P << endl;
     cout << "Testing addition M+P=" << M + P << endl;
     cout << "Testing subtraction M-P=" << M - P << endl;
+    cout << "Testing subtraction P-M=" << P - M << endl;
 
     auto Q = generateRandomPolynomial(100, 0, 1);
     cout << "Q and its degree: " << Q << ", " << Q.degree() << endl;

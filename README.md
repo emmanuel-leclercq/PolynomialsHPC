@@ -18,7 +18,7 @@ Addition between non-ordered sparse polynomials results in a sorted sparse polyn
 4. Division: euclid algorithm
 5. Evaluation: Horner's method
 6. Factorization (TODO)
-7. Interpolation (TODO)
+7. Interpolation: takes a vector<std::pair<T x,T y>> as input and returns a dense polynomial<T>
 8. nth derivatives (TODO)
 9. Root finder (TODO)
 10. Plotting (TODO)
