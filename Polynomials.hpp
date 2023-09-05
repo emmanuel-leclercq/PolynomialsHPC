@@ -101,6 +101,8 @@ public:
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
+    void derivative(int k=1);
+
 //  Basic operators as friend methods
     friend Polynomial<T> operator+<T>(const Polynomial<T> &, const Polynomial<T> &);
 
@@ -125,6 +127,11 @@ public:
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
 };
+
+template<typename T>
+void Polynomial<T>::derivative(int k) {
+
+}
 
 template<typename T>
 bool Polynomial<T>::is_sparse() const {
