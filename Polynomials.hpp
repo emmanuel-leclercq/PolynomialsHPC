@@ -5,6 +5,7 @@
 #include <random>
 #include <complex>
 #include <algorithm>
+#include <iostream>
 #include "utils.hpp"
 
 template<typename T>
@@ -101,7 +102,7 @@ public:
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
-    void derivative(int k=1);
+    void derivative(int k = 1);
 
 //  Basic operators as friend methods
     friend Polynomial<T> operator+<T>(const Polynomial<T> &, const Polynomial<T> &);
@@ -130,7 +131,17 @@ public:
 
 template<typename T>
 void Polynomial<T>::derivative(int k) {
+    if (k <= 0) return;
 
+    if (this->degree() < k) {
+        std::fill(coefficients.begin(), coefficients.end(), 0);
+        return;
+    }
+    for (int i = this->degree(); i >= k; i--) {
+        coefficients[i - k] = coefficients[i] * rangeProduct<T>(i, k);
+    }
+    // Set the last k coefficients to zero.
+    coefficients.resize(n - 1 - k);
 }
 
 template<typename T>
@@ -322,24 +333,33 @@ Polynomial<T> operator%=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
     // +/- implementation ?
+    char var;
+    if constexpr (std::is_same<T, std::complex<float>>::value || std::is_same<T, std::complex<double>>::value ||
+                  std::is_same<T, std::complex<long double>>::value) { var = 'z'; }
+    else { var = 'x'; }
+
     if (p.n < 0) return out;
+
     for (int i = p.n; i > 0; --i) {
         if (!is_zero(p.coefficients[i])) {
-            char var;
 
-            if constexpr (std::is_same<T, std::complex<float>>::value || std::is_same<T, std::complex<double>>::value ||
-                          std::is_same<T, std::complex<long double>>::value) { var = 'z'; }
-            else { var = 'x'; }
+            if (i != p.degree())[[likely]] {
+                if (should_add_plus(p.coefficients[i])) {
+                    out << " + ";
+                } else { out << " "; }
+            }
 
-            out << p.coefficients[i];
+            if (!is_one(p.coefficients[i])) { out << p.coefficients[i]; }
 
             if (i > 1) { out << var << "^" << i; }
-            else if (i == 1) { out << var; }
-            if(p.coefficients[i+1]>=0) { out << " +"; }
+            if (i == 1) { out << var; }
         }
     }
-    if (!is_zero(p.coefficients[0]))
+    if (!is_zero(p.coefficients[0])) {
+        if (should_add_plus(p.coefficients[0])) { out << " + "; }
+        else { out << " "; }
         out << p.coefficients[0];
+    }
 
     return out;
 }

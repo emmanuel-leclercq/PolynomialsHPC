@@ -440,7 +440,7 @@ SparsePolynomial<T> operator+(const SparsePolynomial<T> &lhs, const SparsePolyno
         for (auto it = rhs.begin(); it != rhs.end(); it++) {
             result[it->degree()] += it->coeff();
         }
-        SparsePolynomial<T> ans(result, true);
+        SparsePolynomial<T> ans(result);
         return ans;
     }
 }
