@@ -48,7 +48,7 @@ template<typename T>
 class Polynomial {
 private:
     std::vector<T> coefficients;
-//  Replace degree with template int typename for flexibility?
+    //  Replace degree with template int typename for flexibility?
     int n;
 
 //  extend method facilitates certain operations
@@ -96,13 +96,30 @@ public:
 
     [[nodiscard]] T dominant() const { return coefficients[n]; }
 
+    void derivative(int k = 1) {
+        if (k <= 0) { return; }
+
+
+        if (this->degree() < k) {
+            std::fill(coefficients.begin(), coefficients.end(), 0);
+            return;
+        } else [[likely]] {
+            this->coefficients.resize(this->degree() + 1 - k);
+            T a = factorial<T>(k);
+            for (int i = 0; i < this->degree() + 1 - k; i++) {
+                coefficients[i] = coefficients[i + k] * a;
+                a = a * (k + i + 1) / (i + 1);
+            }
+            n -= k;
+        }
+    }
+
     [[nodiscard]] T &dominant() { return coefficients[n]; }
 
     [[nodiscard]] bool is_sparse() const;
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
-    void derivative(int k = 1);
 
 //  Basic operators as friend methods
     friend Polynomial<T> operator+<T>(const Polynomial<T> &, const Polynomial<T> &);
@@ -128,21 +145,6 @@ public:
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
 };
-
-template<typename T>
-void Polynomial<T>::derivative(int k) {
-    if (k <= 0) return;
-
-    if (this->degree() < k) {
-        std::fill(coefficients.begin(), coefficients.end(), 0);
-        return;
-    }
-    for (int i = this->degree(); i >= k; i--) {
-        coefficients[i - k] = coefficients[i] * rangeProduct<T>(i, k);
-    }
-    // Set the last k coefficients to zero.
-    coefficients.resize(n - 1 - k);
-}
 
 template<typename T>
 bool Polynomial<T>::is_sparse() const {
@@ -355,11 +357,9 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
             if (i == 1) { out << var; }
         }
     }
-    if (!is_zero(p.coefficients[0])) {
-        if (should_add_plus(p.coefficients[0])) { out << " + "; }
-        else { out << " "; }
-        out << p.coefficients[0];
-    }
+    if (should_add_plus(p.coefficients[0])) { out << " + "; }
+    else { out << " "; }
+    out << p.coefficients[0];
 
     return out;
 }

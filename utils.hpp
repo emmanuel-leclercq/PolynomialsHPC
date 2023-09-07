@@ -47,7 +47,7 @@ T factorial(int n) {
 template<typename T>
 T rangeProduct(int n, int k) {
     T result = 1;
-    for (int i = n; i > n - k; i--) {
+    for (int i = n; i > k; i--) {
         result *= i;
     }
     return result;

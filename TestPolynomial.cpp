@@ -79,9 +79,11 @@ int main() {
 
     cout << "time it takes for the product : ";
     cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;
+    cout << p1 << endl;
     p1.derivative();
-    cout << "Test rangeprod(10,1)=" << rangeProduct<int>(10, 1) << endl;
     cout << "Test derivative of p1: " << p1 << endl;
-
+    cout << "p1.degree()=" << p1.degree() << endl;
+    auto monome = Polynomial<int>(3);
+    cout << monome;
     return 0;
 }
