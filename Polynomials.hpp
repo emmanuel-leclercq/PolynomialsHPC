@@ -357,8 +357,10 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
             if (i == 1) { out << var; }
         }
     }
-    if (should_add_plus(p.coefficients[0])) { out << " + "; }
-    else { out << " "; }
+    if(p.degree() != 0)[[likely]] {
+        if (should_add_plus(p.coefficients[0])) { out << " + "; }
+        else { out << " "; }
+    }
     out << p.coefficients[0];
 
     return out;

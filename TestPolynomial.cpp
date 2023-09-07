@@ -84,6 +84,7 @@ int main() {
     cout << "Test derivative of p1: " << p1 << endl;
     cout << "p1.degree()=" << p1.degree() << endl;
     auto monome = Polynomial<int>(3);
-    cout << monome;
+    cout << monome << endl;
+    cout << monome.degree();
     return 0;
 }
