@@ -60,7 +60,7 @@ int main() {
     cout << "p1(2) : " << p1(2) << endl
          << "p2(3) " << p2(3) << endl;
     // Random polynomials generation
-    auto P = generateRandomPolynomial(100, 0, 1);
+    auto P = generateRandomIntPolynomial(100, 0, 1);
 
     std::random_device rd;
     std::mt19937 mt_generator(rd());
@@ -83,8 +83,5 @@ int main() {
     p1.derivative();
     cout << "Test derivative of p1: " << p1 << endl;
     cout << "p1.degree()=" << p1.degree() << endl;
-    auto monome = Polynomial<int>(3);
-    cout << monome << endl;
-    cout << monome.degree();
     return 0;
 }

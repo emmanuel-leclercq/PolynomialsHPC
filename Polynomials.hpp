@@ -11,29 +11,29 @@
 template<typename T>
 class Polynomial;
 
-template<typename T>
-Polynomial<T> operator+(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator-(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator*(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator/(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T> &);
 
-template<typename T>
-Polynomial<T> operator%(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator+=(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator-=(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T> &, const Polynomial<T> &);
 
-template<typename T>
-Polynomial<T> operator*=(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T, typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T>
 Polynomial<T> operator/=(const Polynomial<T> &, const Polynomial<T> &);
@@ -99,9 +99,8 @@ public:
     void derivative(int k = 1) {
         if (k <= 0) { return; }
 
-
         if (this->degree() < k) {
-            std::fill(coefficients.begin(), coefficients.end(), 0);
+            *this = Polynomial<T>();
             return;
         } else [[likely]] {
             this->coefficients.resize(this->degree() + 1 - k);
@@ -122,25 +121,36 @@ public:
 
 
 //  Basic operators as friend methods
-    friend Polynomial<T> operator+<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator-<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator*<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())>
+    operator*(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator/<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator%<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator+=<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator-=<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator*=<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator/=<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator/=(const Polynomial<T1> &, const Polynomial<T2> &);
 
-    friend Polynomial<T> operator%=<T>(const Polynomial<T> &, const Polynomial<T> &);
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &, const Polynomial<T2> &);
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
@@ -179,14 +189,14 @@ T Polynomial<T>::operator()(const U &x) {
  * Could also randomize polynomial degree, or leave it to user
  */
 
-Polynomial<double> generateRandomPolynomial(const int &n, double inf, double sup) {
+Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
     std::random_device rd;
     std::mt19937 G(rd());
     std::uniform_int_distribution<int> unif(inf, sup);
     auto gen = [&G, &unif]() { return unif(G); };
-    std::vector<double> v(n + 1);
+    std::vector<int> v(n + 1);
     std::generate(v.begin(), v.end(), gen);
-    return Polynomial<double>(v);
+    return Polynomial<int>(v);
 }
 
 template<typename T, typename Distribution, typename Generator>
@@ -215,69 +225,72 @@ Polynomial<T> Polynomial<T>::extend(int m) const {
     return this;
 }
 
-template<typename T>
-Polynomial<T> operator+(const Polynomial<T> &p, const Polynomial<T> &q) {
-    auto polynomial_ref_pair = std::minmax(p, q, [](const Polynomial<T> &u, const Polynomial<T> &v) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &p, const Polynomial<T2> &q) {
+    auto polynomial_ref_pair = std::minmax(p, q, [](const Polynomial<T1> &u, const Polynomial<T2> &v) {
         return u.degree() < v.degree();
     });
 
-    Polynomial<T> result(polynomial_ref_pair.second); // single copy of the largest
+    Polynomial<decltype(T1() * T2())> result(polynomial_ref_pair.second); // single copy of the largest
 
     std::transform(
             polynomial_ref_pair.first.coefficients.begin(), polynomial_ref_pair.first.coefficients.end(),
             result.coefficients.begin(),
             result.coefficients.begin(),
-            std::plus<T>());
+            std::plus<decltype(T1() * T2())>());
 
     result.adjust();
 
     return result;
 }
 
-template<typename T>
-Polynomial<T> operator-(const Polynomial<T> &p, const Polynomial<T> &q) {
-    auto polynomial_ref_pair = std::minmax(p, q, [](const Polynomial<T> &u, const Polynomial<T> &v) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &p, const Polynomial<T2> &q) {
+    auto polynomial_ref_pair = std::minmax(p, q, [](const Polynomial<T1> &u, const Polynomial<T2> &v) {
         return u.degree() < v.degree();
     });
-    Polynomial<T> result(polynomial_ref_pair.second); // copie du plus grand dans le résultat.
+    Polynomial<decltype(T1() * T2())> result(polynomial_ref_pair.second); // copie du plus grand dans le résultat.
     if (&polynomial_ref_pair.first == &p) {// pour trouver qui est celui qui porte le - entre le min et le max!
         std::transform(
                 polynomial_ref_pair.first.coefficients.begin(), polynomial_ref_pair.first.coefficients.end(),
                 result.coefficients.begin(),
                 result.coefficients.begin(),
-                std::minus<T>()); // l'ordre des arguments permet de ne parcourir que jusqu'au degré du plus petit polynôme.
+                std::minus<decltype(T1() *
+                                    T2())>()); // l'ordre des arguments permet de ne parcourir que jusqu'au degré du plus petit polynôme.
     } else {
         std::transform(result.coefficients.begin(),
                        result.coefficients.end(), polynomial_ref_pair.first.coefficients.begin(),
                        result.coefficients.begin(),
-                       std::minus<T>()); // l'ordre des arguments permet de ne parcourir que jusqu'au degré du plus petit polynôme.
+                       std::minus<decltype(T1() *
+                                           T2())>()); // l'ordre des arguments permet de ne parcourir que jusqu'au degré du plus petit polynôme.
     }
     result.adjust();
     result.dominant() = polynomial_ref_pair.second.dominant();
     return result;
 
     /*
-     * The below alternative is slightly slower, (but much more readable...)
+     * The below alternative is slightly slower (but much more readable...)
+     * as std::transform is used twice (one time in the plus operation)
      */
-//    Polynomial<T> result(q);
+//    Polynomial<decltype(T1() * T2())> result(q);
 //    std::transform(result.coefficients.begin(), result.coefficients.end(), result.coefficients.begin(),
-//                   std::negate<T>());
+//                   std::negate<decltype(T1() * T2())>());
 //    return p + result;
 };
 
-template<typename T>
-Polynomial<T> operator*(const Polynomial<T> &p, const Polynomial<T> &q) {
-    if (p.n < 0 || q.n < 0) {
-        return Polynomial<T>();
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polynomial<T2> &q) {
+    if (p.n < 0 || q.n < 0)[[unlikely]] {
+        return Polynomial<decltype(T1() * T2())>();
     }
     int m = p.n + q.n;
-    std::vector<T> coeffs(m + 1);
+    std::vector<decltype(T1() * T2())> coeffs(m + 1);
     for (int i = 0; i <= p.degree(); ++i) {
         for (int j = 0; j <= q.degree(); ++j) {
             coeffs[i + j] += p[i] * q[j];
         }
     }
-    return Polynomial<T>(std::move(coeffs));
+    return Polynomial<decltype(T1() * T2())>(std::move(coeffs));
 };
 
 template<typename T>
@@ -297,38 +310,38 @@ std::pair<Polynomial<T>, Polynomial<T>> euclid_div(const Polynomial<T> &a, const
     return ans;
 }
 
-template<typename T>
-Polynomial<T> operator/(const Polynomial<T> &p, const Polynomial<T> &q) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &p, const Polynomial<T2> &q) {
     return euclid_div(p, q).first;
 };
 
-template<typename T>
-Polynomial<T> operator%(const Polynomial<T> &p, const Polynomial<T> &q) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &p, const Polynomial<T2> &q) {
     return euclid_div(p, q).second;
 };
 
-template<typename T>
-Polynomial<T> operator+=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
     return lhs + rhs;
 };
 
-template<typename T>
-Polynomial<T> operator-=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
     return lhs - rhs;
 };
 
-template<typename T>
-Polynomial<T> operator*=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
     return lhs * rhs;
 };
 
-template<typename T>
-Polynomial<T> operator/=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator/=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
     return lhs / rhs;
 };
 
-template<typename T>
-Polynomial<T> operator%=(const Polynomial<T> &lhs, const Polynomial<T> &rhs) {
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
     return lhs % rhs;
 }
 
@@ -340,7 +353,10 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
                   std::is_same<T, std::complex<long double>>::value) { var = 'z'; }
     else { var = 'x'; }
 
-    if (p.n < 0) return out;
+    if (p.n < 0) [[unlikely]] {
+        out << "0";
+        return out;
+    }
 
     for (int i = p.n; i > 0; --i) {
         if (!is_zero(p.coefficients[i])) {
@@ -353,11 +369,11 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 
             if (!is_one(p.coefficients[i])) { out << p.coefficients[i]; }
 
-            if (i > 1) { out << var << "^" << i; }
+            if (i > 1)[[likely]] { out << var << "^" << i; }
             if (i == 1) { out << var; }
         }
     }
-    if(p.degree() != 0)[[likely]] {
+    if (p.degree() != 0)[[likely]] {
         if (should_add_plus(p.coefficients[0])) { out << " + "; }
         else { out << " "; }
     }
