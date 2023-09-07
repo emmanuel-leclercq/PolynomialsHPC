@@ -22,16 +22,18 @@ int main() {
     vector<int> v2{1, 0, 1};
     Polynomial<int> p2(v2);
 
+    vector<double> v3{6, 3, 0, 1, 5};
+    Polynomial<double> p3(v3);
+
     std::complex<double> a(2.0, 1.0);
     std::complex<double> b(0.0, 1.0);
     vector<std::complex<double>> vc{a, b};
-
     Polynomial<std::complex<double>> pc(vc);
 
     std::complex<int> one = 1;
     cout << "Is one one : " << is_one(one) << endl;
 
-    cout << is_zero(a) << endl;
+    cout << "is 2+i zero : " << is_zero(a) << endl;
     cout << Polynomial(a, 3) << endl;
     cout << endl;
 
@@ -52,13 +54,25 @@ int main() {
 
     // Division and remainder
     Polynomial<int> div = p1 / p2;
-    Polynomial<int> reste = p1 % p2;
+    Polynomial<int> remainder = p1 % p2;
     cout << "Quotient : " << div << endl;
-    cout << "Reste : " << reste << endl;
+    cout << "Remainder : " << remainder << endl;
 
     // functiòn evaluation
     cout << "p1(2) : " << p1(2) << endl
-         << "p2(3) " << p2(3) << endl;
+         << "p2(3) : " << p2(3) << endl;
+
+    //derivative and antiderivative
+    p3.derivative();
+    cout << "Test p1.derivative() = " << p3 << endl;
+    cout << "p1.degree() = " << p3.degree() << endl;
+    p3.derivative(-1);
+    cout << "Test p1.derivative(-1) = " << p3 << endl;
+    cout << "p1.degree() = " << p3.degree() << endl;
+    cout << "test derivative(p1) = " << derivative<double>(p3) << endl;
+    cout << "test derivative(p1,-1) = " << derivative<double>(p3,-1) << endl;
+
+
     // Random polynomials generation
     auto P = generateRandomIntPolynomial(100, 0, 1);
 
@@ -69,19 +83,16 @@ int main() {
 
     auto Q = generateRandomPolynomial<double>(30, double_distribution, def_generator);
 
-    cout << "P: " << P << endl;
-    cout << "Q: " << Q << endl;
+    cout << "P : " << P << endl;
+    cout << "Q : " << Q << endl;
 
     auto start = std::chrono::high_resolution_clock::now();
     auto dom = (P * Q).dominant();
     auto end = std::chrono::high_resolution_clock::now();
-    cout << "Dominant coefficient of random polynomial product: " << dom << endl;
+    auto timing = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    cout << "Dominant coefficient of random polynomial product : " << dom << endl;
 
-    cout << "time it takes for the product : ";
-    cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms" << endl;
-    cout << p1 << endl;
-    p1.derivative();
-    cout << "Test derivative of p1: " << p1 << endl;
-    cout << "p1.degree()=" << p1.degree() << endl;
+    cout << "Time it takes for the product : ";
+    cout << timing << "ms" << endl;
     return 0;
 }

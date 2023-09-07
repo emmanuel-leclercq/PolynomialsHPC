@@ -45,10 +45,12 @@ template<typename T>
 std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
 
 template<typename T>
+Polynomial<T> derivative(const Polynomial<T> &P, int k = 1);
+
+template<typename T>
 class Polynomial {
 private:
     std::vector<T> coefficients;
-    //  Replace degree with template int typename for flexibility?
     int n;
 
 //  extend method facilitates certain operations
@@ -58,6 +60,8 @@ private:
     void adjust();
 
 public:
+
+
 //    Constructors
 //    Default polynomial is 0, degree=-1 for convenience
     Polynomial() : n(-1), coefficients(0) {}
@@ -96,22 +100,7 @@ public:
 
     [[nodiscard]] T dominant() const { return coefficients[n]; }
 
-    void derivative(int k = 1) {
-        if (k <= 0) { return; }
-
-        if (this->degree() < k) {
-            *this = Polynomial<T>();
-            return;
-        } else [[likely]] {
-            this->coefficients.resize(this->degree() + 1 - k);
-            T a = factorial<T>(k);
-            for (int i = 0; i < this->degree() + 1 - k; i++) {
-                coefficients[i] = coefficients[i + k] * a;
-                a = a * (k + i + 1) / (i + 1);
-            }
-            n -= k;
-        }
-    }
+    void derivative(int k = 1);
 
     [[nodiscard]] T &dominant() { return coefficients[n]; }
 
@@ -154,6 +143,8 @@ public:
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
+
+    friend Polynomial<T> derivative<T>(const Polynomial<T> &P, int k);
 };
 
 template<typename T>
@@ -164,7 +155,7 @@ bool Polynomial<T>::is_sparse() const {
             zeros++;
         }
     }
-    return (zeros > this->degree() / 2);
+    return (zeros > n / 2);
 }
 
 template<typename T>
@@ -223,6 +214,59 @@ template<typename T>
 Polynomial<T> Polynomial<T>::extend(int m) const {
     if (m > n) { coefficients.reserve(m + 1); }
     return this;
+}
+
+template<typename T>
+Polynomial<T> derivative(const Polynomial<T> &P, int k) {
+    if (k == 0) [[unlikely]] { return P; }
+    if (P.n < k) { return Polynomial<T>(); }
+    auto Q = P;
+    if (P.n < k) {
+        Q.coefficients.resize(Q.n + 1 - k);
+        for (int i = Q.n; i > -1; i--) {
+            Q.coefficients[i] /= rangeProduct<T>(i + 1, i - k);
+            std::swap(Q.coefficients[i], Q.coefficients[i - k]);
+        }
+        Q.n -= k;
+    }
+    if (k > 0 && P.n >= k) {
+        Q.coefficients.resize(Q.n + 1 - k);
+        T a = factorial<T>(k);
+        for (int i = 0; i < Q.n + 1 - k; i++) {
+            Q.coefficients[i] = Q.coefficients[i + k] * a;
+            a = a * (k + i + 1) / (i + 1);
+        }
+        Q.n -= k;
+    }
+    Q.adjust();
+    return Q;
+}
+
+template<typename T>
+void Polynomial<T>::derivative(int k) {
+    if (k == 0) [[unlikely]] { return; }
+    if (n < k) {
+        *this = Polynomial<T>();
+        return;
+    }
+    if (k < 0) {
+        coefficients.resize(n + 1 - k);
+        for (int i = n; i > -1; i--) {
+            coefficients[i] /= rangeProduct<T>(i + 1, i - k);
+            std::swap(coefficients[i], coefficients[i - k]);
+        }
+        n -= k;
+    }
+    if (k > 0 && n >= k) {
+        this->coefficients.resize(n + 1 - k);
+        T a = factorial<T>(k);
+        for (int i = 0; i < n + 1 - k; i++) {
+            coefficients[i] = coefficients[i + k] * a;
+            a = a * (k + i + 1) / (i + 1);
+        }
+        n -= k;
+    }
+    adjust();
 }
 
 template<typename T1, typename T2>
@@ -350,35 +394,50 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
     // +/- implementation ?
     char var;
     if constexpr (std::is_same<T, std::complex<float>>::value || std::is_same<T, std::complex<double>>::value ||
-                  std::is_same<T, std::complex<long double>>::value) { var = 'z'; }
-    else { var = 'x'; }
-
-    if (p.n < 0) [[unlikely]] {
-        out << "0";
-        return out;
-    }
-
-    for (int i = p.n; i > 0; --i) {
-        if (!is_zero(p.coefficients[i])) {
-
-            if (i != p.degree())[[likely]] {
-                if (should_add_plus(p.coefficients[i])) {
-                    out << " + ";
-                } else { out << " "; }
+                  std::is_same<T, std::complex<long double>>::value) {
+        var = 'z';
+        for (int i = p.n; i > 1; --i) {
+            if (!is_zero(p.coefficients[i])) {
+                out << p.coefficients[i] << var << "^" << i << " + ";
             }
+        }
+        out << p.coefficients[0] << var << "^" << 0;
+    } else {
+        var = 'x';
 
-            if (!is_one(p.coefficients[i])) { out << p.coefficients[i]; }
+        if (p.n < 0) {
+            out << "0";
+            return out;
+        }
 
-            if (i > 1)[[likely]] { out << var << "^" << i; }
-            if (i == 1) { out << var; }
+        for (int i = p.n; i > 0; --i) {
+            if (!is_zero(p.coefficients[i])) {
+
+                if (i != p.degree())[[likely]] {
+                    if (should_add_plus(p.coefficients[i])) {
+                        out << " +";
+                    }
+                    if (should_add_plus(-p.coefficients[i])) {
+                        out << " - ";
+                    } else { out << " "; }
+                }
+
+                if (!is_one(p.coefficients[i]) && !is_one(-p.coefficients[i])) {
+                    out << std::abs(p.coefficients[i]);
+                }
+                if (i > 1)[[likely]] { out << var << "^" << i; }
+                if (i == 1) { out << var; }
+            }
+        }
+        if (!is_zero(p.coefficients[0])) {
+            if (p.degree() != 0) {
+                if (should_add_plus(p.coefficients[0])) { out << " +"; }
+                if (should_add_plus(-p.coefficients[0])) { out << " - "; }
+                else { out << " "; }
+            }
+            out << std::abs(p.coefficients[0]);
         }
     }
-    if (p.degree() != 0)[[likely]] {
-        if (should_add_plus(p.coefficients[0])) { out << " + "; }
-        else { out << " "; }
-    }
-    out << p.coefficients[0];
-
     return out;
 }
 

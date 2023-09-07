@@ -46,8 +46,10 @@ T factorial(int n) {
 
 template<typename T>
 T rangeProduct(int n, int k) {
+    auto x = std::minmax(n, k);
+
     T result = 1;
-    for (int i = n; i > k; i--) {
+    for (int i = x.first; i <= x.second; i++) {
         result *= i;
     }
     return result;
