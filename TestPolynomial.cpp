@@ -70,7 +70,7 @@ int main() {
     cout << "Test p1.derivative(-1) = " << p3 << endl;
     cout << "p1.degree() = " << p3.degree() << endl;
     cout << "test derivative(p1) = " << derivative<double>(p3) << endl;
-    cout << "test derivative(p1,-1) = " << derivative<double>(p3,-1) << endl;
+    cout << "test derivative(p1,-1) = " << derivative<double>(p3, -1) << endl;
 
 
     // Random polynomials generation

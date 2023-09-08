@@ -5,6 +5,8 @@
 #include <random>
 #include <complex>
 #include <algorithm>
+#include <cmath>
+#include <limits>
 #include <iostream>
 #include "utils.hpp"
 
@@ -221,11 +223,13 @@ Polynomial<T> derivative(const Polynomial<T> &P, int k) {
     if (k == 0) [[unlikely]] { return P; }
     if (P.n < k) { return Polynomial<T>(); }
     auto Q = P;
-    if (P.n < k) {
+    if (k < 0) {
         Q.coefficients.resize(Q.n + 1 - k);
+        T a = factorial<T>(Q.n) / factorial<T>(Q.n - k);
         for (int i = Q.n; i > -1; i--) {
-            Q.coefficients[i] /= rangeProduct<T>(i + 1, i - k);
+            Q.coefficients[i] *= a;
             std::swap(Q.coefficients[i], Q.coefficients[i - k]);
+            a = a * (i - k) / T(i);
         }
         Q.n -= k;
     }
@@ -251,9 +255,11 @@ void Polynomial<T>::derivative(int k) {
     }
     if (k < 0) {
         coefficients.resize(n + 1 - k);
+        T a = factorial<T>(n) / factorial<T>(n - k);
         for (int i = n; i > -1; i--) {
-            coefficients[i] /= rangeProduct<T>(i + 1, i - k);
+            coefficients[i] *= a;
             std::swap(coefficients[i], coefficients[i - k]);
+            a = a * (i - k) / T(i);
         }
         n -= k;
     }
