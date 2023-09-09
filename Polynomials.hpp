@@ -82,7 +82,7 @@ public:
     explicit Polynomial(const std::vector<T> &&coeffs) : coefficients(std::move(coeffs)),
                                                          n(coeffs.size() - 1) { adjust(); }
 
-    explicit Polynomial(const std::vector<T> &&roots, bool fromRoots);
+    explicit Polynomial(const std::vector<T> &roots, bool fromRoots);
 
 //  Copy/move assignments
     Polynomial<T> &operator=(const Polynomial<T> &) = default;
@@ -95,9 +95,9 @@ public:
 
 //  return image of U by P
     template<typename U>
-    T operator()(const U &);
+    T operator()(const U &) const;
 
-    std::vector<T> operator()(const std::vector<T> &points) const;
+    std::vector<T> multipointEval(const std::vector<T> &points) const;
 
 //  Basic accessors/mutators
     [[nodiscard]] int degree() const { return n; }
@@ -152,14 +152,14 @@ public:
 };
 
 template<typename T>
-Polynomial<T>::Polynomial(const std::vector<T> &&roots, bool fromRoots) {
+Polynomial<T>::Polynomial(const std::vector<T> &roots, bool fromRoots) {
     if (fromRoots) {
         *this = Polynomial<T>({1});
         for (const auto &root: roots) {
             *this = *this * Polynomial<T>({-root, 1});
         }
-//        *this = std::move(temp);
     } else { *this = Polynomial<T>(); }
+    n = coefficients.size() - 1;
 }
 
 template<typename T>
@@ -175,7 +175,7 @@ bool Polynomial<T>::is_sparse() const {
 
 template<typename T>
 template<typename U>
-T Polynomial<T>::operator()(const U &x) {
+T Polynomial<T>::operator()(const U &x) const {
     /*
      * Using Horner's method for single point evaluation
      * Possibility to add different methods will be added for sparse cases
@@ -190,8 +190,34 @@ T Polynomial<T>::operator()(const U &x) {
 }
 
 template<typename T>
-std::vector<T> Polynomial<T>::operator()(const std::vector<T> &points) const {
-    return std::vector<T>();
+std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const {
+    /*
+     * Algorithm inspired by Modern Computer Algebra - Joachim von zur Gathen, Jürgen Gerhard  (2013)
+     */
+
+    int m = points.size();
+    if (m == 1) {
+        return std::vector<T>{this->operator()(points[0])};
+    }
+
+    //Splitting in half
+    std::vector<T> pointsLeft(points.begin(), points.begin() + m / 2);
+    std::vector<T> pointsRight(points.begin() + m / 2, points.end());
+
+    // Construct polynomials from roots
+    Polynomial<T> Q1(pointsLeft, true);
+    Polynomial<T> Q2(pointsRight, true);
+
+    // Compute remainders
+    auto pair = euclid_div(*this, Q1 * Q2);
+    Polynomial<T> remainderQ1 = (*this) % Q1;
+    Polynomial<T> remainderQ2 = (*this) % Q2;
+
+    // Merge results
+    std::vector<T> results = pair.first.multipointEval(pointsLeft);
+    std::vector<T> rightResults = pair.second.multipointEval(pointsRight);
+    results.insert(results.end(), rightResults.begin(), rightResults.end());
+    return results;
 }
 
 Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {

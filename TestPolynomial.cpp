@@ -41,8 +41,14 @@ int main() {
     cout << "p2 : " << p2 << endl;
     cout << endl;
 
-    cout << "Building polynomial from roots 1,2: " << Polynomial<double>({1, 2}, true) << endl << endl;
-    cout << endl;
+    Polynomial<double> withRoots({1, 2, 3}, true);
+    cout << "Building polynomial from roots 1,2,3: " << withRoots << endl << endl;
+    std::vector<double> points{1, 2, 3};
+    auto ans{withRoots.multipointEval(points)};
+    cout << "checking correctness with multipoint evaluation:";
+    for (auto x: ans) { cout << x << " "; }
+    cout << endl << endl;
+
     /*
     * Testing basic operations
     */
