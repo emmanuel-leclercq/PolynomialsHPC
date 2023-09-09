@@ -39,7 +39,10 @@ int main() {
 
     cout << "p1 : " << p1 << endl;
     cout << "p2 : " << p2 << endl;
+    cout << endl;
 
+    cout << "Building polynomial from roots 1,2: " << Polynomial<double>({1, 2}, true) << endl << endl;
+    cout << endl;
     /*
     * Testing basic operations
     */
@@ -51,16 +54,18 @@ int main() {
     cout << "p1-p2 : " << diff << endl;
     cout << "p2-p1 : " << diff2 << endl;
     cout << "p1*p2 : " << prod << endl;
+    cout << endl;
 
     // Division and remainder
     Polynomial<int> div = p1 / p2;
     Polynomial<int> remainder = p1 % p2;
     cout << "Quotient : " << div << endl;
     cout << "Remainder : " << remainder << endl;
-
-    // functiòn evaluation
+    cout << endl;
+    // function evaluation
     cout << "p1(2) : " << p1(2) << endl
          << "p2(3) : " << p2(3) << endl;
+    cout << endl;
 
     //derivative and antiderivative
     p3.derivative();
@@ -70,8 +75,8 @@ int main() {
     cout << "Test p1.derivative(-1) = " << p3 << endl;
     cout << "p1.degree() = " << p3.degree() << endl;
     cout << "test derivative(p1) = " << derivative<double>(p3) << endl;
-    cout << "test derivative(p1,-1) = " << derivative<double>(p3,-1) << endl;
-
+    cout << "test derivative(p1,-1) = " << derivative<double>(p3, -1) << endl;
+    cout << endl;
 
     // Random polynomials generation
     auto P = generateRandomIntPolynomial(100, 0, 1);
