@@ -64,3 +64,52 @@ template<typename T>
 bool should_add_plus(const std::complex<T> &z) {
     return true;
 }
+
+class Timer {
+    std::chrono::time_point<std::chrono::steady_clock> timePoint;
+    size_t value;
+public:
+    void start() { timePoint = std::chrono::steady_clock::now(); }
+
+    void finish() {
+        auto curr = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(curr - timePoint);
+        value = elapsed.count();
+    }
+
+    size_t operator()() const { return value; }
+};
+
+template<typename U>
+void fft(std::vector<std::complex<U>> &a, bool invert) {
+    int n = a.size();
+
+    for (int i = 1, j = 0; i < n; i++) {
+        int bit = n >> 1;
+        for (; j & bit; bit >>= 1)
+            j ^= bit;
+        j ^= bit;
+
+        if (i < j)
+            swap(a[i], a[j]);
+    }
+
+    for (int len = 2; len <= n; len <<= 1) {
+        double ang = 2 * M_PI / len * (invert ? -1 : 1);
+        std::complex<U> wlen(cos(ang), sin(ang));
+        for (int i = 0; i < n; i += len) {
+            std::complex<U> w(1);
+            for (int j = 0; j < len / 2; j++) {
+                std::complex<U> u = a[i + j], v = a[i + j + len / 2] * w;
+                a[i + j] = u + v;
+                a[i + j + len / 2] = u - v;
+                w *= wlen;
+            }
+        }
+    }
+
+    if (invert) {
+        for (std::complex<U> &x: a)
+            x /= n;
+    }
+}

@@ -47,6 +47,9 @@ std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
 template<typename T>
 Polynomial<T> derivative(const Polynomial<T> &P, int k = 1);
 
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+
 template<typename T>
 class Polynomial {
 private:
@@ -92,17 +95,17 @@ public:
 //  Destructor
     ~Polynomial() = default;
 
+//  Basic accessors/mutators
+    [[nodiscard]] int degree() const { return n; }
+
+    [[nodiscard]] T dominant() const { return coefficients[n]; }
 
 //  return image of U by P
     template<typename U>
     T operator()(const U &) const;
 
-    std::vector<T> multipointEval(const std::vector<T> &points) const;
+    [[nodiscard]] std::vector<T> multipointEval(const std::vector<T> &points) const;
 
-//  Basic accessors/mutators
-    [[nodiscard]] int degree() const { return n; }
-
-    [[nodiscard]] T dominant() const { return coefficients[n]; }
 
     void derivative(int k = 1);
 
@@ -111,7 +114,6 @@ public:
     [[nodiscard]] bool is_sparse() const;
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
-
 
 //  Basic operators as friend methods
     template<typename T1, typename T2>
@@ -149,6 +151,9 @@ public:
     <<<>(std::ostream &, const Polynomial<T> &);
 
     friend Polynomial<T> derivative<T>(const Polynomial<T> &P, int k);
+
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
 };
 
 template<typename T>
@@ -368,6 +373,7 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
         return Polynomial<decltype(T1() * T2())>();
     }
     int m = p.n + q.n;
+
     std::vector<decltype(T1() * T2())> coeffs(m + 1);
     for (int i = 0; i <= p.degree(); ++i) {
         for (int j = 0; j <= q.degree(); ++j) {
@@ -479,6 +485,29 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
         }
     }
     return out;
+}
+
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b) {
+    std::vector<std::complex<decltype(T1() * T2())>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
+            b.coefficients.begin(), b.coefficients.end());
+    int n = 1;
+    while (n < a.degree() + b.degree() + 2)
+        n <<= 1;
+    fa.resize(n);
+    fb.resize(n);
+
+    fft(fa, false);
+    fft(fb, false);
+    for (int i = 0; i < n; i++)
+        fa[i] *= fb[i];
+    fft(fa, true);
+
+    Polynomial<decltype(T1() * T2())> result;
+    result.coefficients.reserve(n);
+    for (int i = 0; i < n; i++)
+        result.coefficients[i] = fa[i].real();
+    return result;
 }
 
 #endif //POLYNOMIALSHPC_POLYNOMIALS_HPP
