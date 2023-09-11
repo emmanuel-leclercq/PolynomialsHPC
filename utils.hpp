@@ -80,8 +80,7 @@ public:
     size_t operator()() const { return value; }
 };
 
-template<typename U>
-void fft(std::vector<std::complex<U>> &a, bool invert) {
+void fft(std::vector<std::complex<double>> &a, bool invert) {
     int n = a.size();
 
     for (int i = 1, j = 0; i < n; i++) {
@@ -90,17 +89,16 @@ void fft(std::vector<std::complex<U>> &a, bool invert) {
             j ^= bit;
         j ^= bit;
 
-        if (i < j)
-            swap(a[i], a[j]);
+        if (i < j) { swap(a[i], a[j]); }
     }
 
     for (int len = 2; len <= n; len <<= 1) {
         double ang = 2 * M_PI / len * (invert ? -1 : 1);
-        std::complex<U> wlen(cos(ang), sin(ang));
+        std::complex<double> wlen(cos(ang), sin(ang));
         for (int i = 0; i < n; i += len) {
-            std::complex<U> w(1);
+            std::complex<double> w(1);
             for (int j = 0; j < len / 2; j++) {
-                std::complex<U> u = a[i + j], v = a[i + j + len / 2] * w;
+                std::complex<double> u = a[i + j], v = a[i + j + len / 2] * w;
                 a[i + j] = u + v;
                 a[i + j + len / 2] = u - v;
                 w *= wlen;
@@ -109,7 +107,7 @@ void fft(std::vector<std::complex<U>> &a, bool invert) {
     }
 
     if (invert) {
-        for (std::complex<U> &x: a)
+        for (auto &x: a)
             x /= n;
     }
 }

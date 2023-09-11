@@ -48,7 +48,10 @@ template<typename T>
 Polynomial<T> derivative(const Polynomial<T> &P, int k = 1);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b);
 
 template<typename T>
 class Polynomial {
@@ -153,7 +156,10 @@ public:
     friend Polynomial<T> derivative<T>(const Polynomial<T> &P, int k);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+    friend Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+
+    template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b);
 };
 
 template<typename T>
@@ -488,26 +494,38 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> multiply(const Polynomial<T1> &a, const Polynomial<T2> &b) {
-    std::vector<std::complex<decltype(T1() * T2())>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
+Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b) {
+    std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
             b.coefficients.begin(), b.coefficients.end());
     int n = 1;
-    while (n < a.degree() + b.degree() + 2)
-        n <<= 1;
+    while (n < a.degree() + b.degree() + 2) { n <<= 1; }
     fa.resize(n);
     fb.resize(n);
 
     fft(fa, false);
     fft(fb, false);
-    for (int i = 0; i < n; i++)
-        fa[i] *= fb[i];
+    for (int i = 0; i < n; i++) { fa[i] *= fb[i]; }
     fft(fa, true);
 
     Polynomial<decltype(T1() * T2())> result;
     result.coefficients.reserve(n);
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) {
         result.coefficients[i] = fa[i].real();
+    }
+    result.n = a.n + b.n;
+    for (auto x: result.coefficients) { std::cout << x << " "; }
     return result;
+}
+
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b) {
+    if (a.degree() + b.degree() < 5) { return a * b; }
+    auto polynomial_ref_pair = std::minmax(a, b,
+                                           [](const Polynomial<T1> &u, const Polynomial<T2> &v) {
+                                               return u.degree() < v.degree();
+                                           });
+
+    return Polynomial<decltype(T1() * T2())>();
 }
 
 #endif //POLYNOMIALSHPC_POLYNOMIALS_HPP
