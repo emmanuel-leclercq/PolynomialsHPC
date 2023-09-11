@@ -35,6 +35,9 @@ Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T> &, const Polyno
 template<typename T, typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &, const Polynomial<T2> &);
 
+template<typename T1, typename T2>
+bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
+
 template<typename T>
 Polynomial<T> operator/=(const Polynomial<T> &, const Polynomial<T> &);
 
@@ -150,6 +153,9 @@ public:
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &, const Polynomial<T2> &);
 
+    template<typename T1, typename T2>
+    friend bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
+
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
 
@@ -160,6 +166,7 @@ public:
 
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b);
+
 };
 
 template<typename T>
@@ -441,6 +448,13 @@ Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &lhs, const Po
     return lhs % rhs;
 }
 
+template<typename T1, typename T2>
+bool operator==(const Polynomial<T1> &P, const Polynomial<T2> &Q) {
+    if (P.degree() != Q.degree()) { return false; }
+    for (int i = 0; i < P.degree() + 1; i++) { if (P[i] != Q[i]) { return false; }}
+    return true;
+}
+
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
     // +/- implementation ?
@@ -495,26 +509,30 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b) {
-    std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
-            b.coefficients.begin(), b.coefficients.end());
-    int n = 1;
-    while (n < a.degree() + b.degree() + 2) { n <<= 1; }
-    fa.resize(n);
-    fb.resize(n);
+    if (a.n < 0 || b.n < 0) {
+        Polynomial<decltype(T1() * T2())> zero;
+        return zero;
+    } else {
+        std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
+                b.coefficients.begin(), b.coefficients.end());
+        int n = 1;
+        while (n < a.coefficients.size() + b.coefficients.size()) { n <<= 1; }
+        fa.resize(n);
+        fb.resize(n);
 
-    fft(fa, false);
-    fft(fb, false);
-    for (int i = 0; i < n; i++) { fa[i] *= fb[i]; }
-    fft(fa, true);
+        fft(fa, false);
+        fft(fb, false);
+        for (int i = 0; i < n; i++) { fa[i] *= fb[i]; }
+        fft(fa, true);
 
-    Polynomial<decltype(T1() * T2())> result;
-    result.coefficients.reserve(n);
-    for (int i = 0; i < n; i++) {
-        result.coefficients[i] = fa[i].real();
+        Polynomial<decltype(T1() * T2())> result;
+        result.coefficients.reserve(n);
+        for (int i = 0; i < n; i++) {
+            result.coefficients[i] = fa[i].real();
+        }
+        result.n = a.n + b.n;
+        return result;
     }
-    result.n = a.n + b.n;
-    for (auto x: result.coefficients) { std::cout << x << " "; }
-    return result;
 }
 
 template<typename T1, typename T2>
