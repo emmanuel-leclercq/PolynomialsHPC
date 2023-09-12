@@ -20,33 +20,21 @@ int main() {
     std::cout << ans << std::endl;
     std::cout << p1 * p2 << std::endl;
     std::cout << (ans == (p1 * p2)) << std::endl;
-    for (int i = 0; i < 50; i++) {
-        auto P = generateRandomIntPolynomial(5, 0, 1);
-        auto Q = generateRandomIntPolynomial(3, 0, 1);
-        if ((karatsuba(P, Q)) != P * Q) {
-            std::cout << "FFT: " << fftmultiply(P, Q) << std::endl;
-            std::cout << "brute force=" << P * Q << std::endl;
-            std::cout << "P=" << P << std::endl;
-            std::cout << "Q=" << Q << std::endl;
-            std::cout << "P.degree()=" << P.degree() << std::endl;
-            std::cout << "Q.degree()=" << Q.degree() << std::endl << std::endl;
-
-        }
-    }
-
     Timer timer;
-    auto R = generateRandomIntPolynomial(4096, -100, 100);
-    auto S = generateRandomIntPolynomial(4096, -100, 100);
-    timer.start();
-    karatsuba(R, S);
-    timer.finish();
-    std::cout << "Polynomial deg 1000 multiplication using karatsuba: " << timer() << "ms" << std::endl;
+
+
+    auto R = generateRandomIntPolynomial(10000, -1000, 1000);
+    auto S = generateRandomIntPolynomial(10000, -1000, 1000);
+
     timer.start();
     R * S;
     timer.finish();
-    std::cout << "Polynomial deg 1000 multiplication using brute force: " << timer() << "ms" << std::endl;
-
-
+    std::cout << "Polynomial deg 10000 multiplication using brute force: " << timer() << "ms" << std::endl;
+    timer.start();
+    fftmultiply(R, S);
+    timer.finish();
+    std::cout << "Polynomial deg 10000 multiplication using FFT: " << timer() << "ms" << std::endl;
+//    std::cout << fftmultiply(R, S);
 
 
 //    auto P = generateRandomIntPolynomial(1000, -100, 100);

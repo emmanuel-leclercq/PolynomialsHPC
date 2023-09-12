@@ -442,7 +442,11 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
         return Polynomial<decltype(T1() * T2())>();
     }
     int m = p.n + q.n;
-
+    /*
+     * FFT multiplication is accurate for ints only, and become (much) faster for out degree>200
+     */
+//    if (std::is_same<decltype(T1() * T2()), int>::value && m>200) { return fftmultiply(p, q); }
+//    else {
     std::vector<decltype(T1() * T2())> coeffs(m + 1);
     for (int i = 0; i <= p.degree(); ++i) {
         for (int j = 0; j <= q.degree(); ++j) {
@@ -450,6 +454,7 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
         }
     }
     return Polynomial<decltype(T1() * T2())>(std::move(coeffs));
+//    }
 }
 
 template<typename T>
@@ -584,7 +589,7 @@ Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Pol
         Polynomial<decltype(T1() * T2())> result;
         result.coefficients.reserve(n);
         for (int i = 0; i < n; i++) {
-            result.coefficients[i] = fa[i].real();
+            result.coefficients[i] = round(fa[i].real());
         }
         result.n = a.n + b.n;
         return result;

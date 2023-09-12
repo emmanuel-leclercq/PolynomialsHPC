@@ -9,5 +9,5 @@ add_executable(Dense TestPolynomial.cpp)
 
 add_executable(Sparse TestSparsePolynomial.cpp)
 
-#add_executable(bench multiplicationBenchmark.cpp)
+add_executable(bench multiplicationBenchmark.cpp)
 
