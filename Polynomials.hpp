@@ -53,9 +53,6 @@ Polynomial<T> derivative(const Polynomial<T> &P, int k = 1);
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
 
-template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b);
-
 template<typename T>
 class Polynomial {
 private:
@@ -67,6 +64,58 @@ private:
 
 //  adjust removes trailing zeros
     void adjust();
+
+    template<typename T1, typename T2>
+    static void multiplyRec(const std::vector<T1> &A, size_t startA, size_t endA,
+                            const std::vector<T2> &B, size_t startB, size_t endB,
+                            std::vector<decltype(T1() * T2())> &result, size_t startResult) {
+        if (endA - startA <= 64 || endB - startB <= 64) {
+            // Base case: standard polynomial multiplication
+            for (size_t i = startA; i < endA; ++i) {
+                for (size_t j = startB; j < endB; ++j) {
+                    result[startResult + i + j - startA - startB] += A[i] * B[j];
+                }
+            }
+            return;
+        }
+
+        size_t midA = (startA + endA) / 2;
+        size_t midB = (startB + endB) / 2;
+
+        // Recursive computations
+        multiplyRec(A, startA, midA, B, startB, midB, result, startResult);
+        multiplyRec(A, midA, endA, B, midB, endB, result, startResult + midA + midB);
+        addAndMultiply(A, startA, midA, midA, endA,
+                       B, startB, midB, midB, endB,
+                       result, startResult + midA);
+    }
+
+    // Helper function to compute (A0 + A1) * (B0 + B1)
+    template<typename T1, typename T2>
+    static void addAndMultiply(const std::vector<T1> &A, size_t startA0, size_t endA0, size_t startA1, size_t endA1,
+                               const std::vector<T2> &B, size_t startB0, size_t endB0, size_t startB1, size_t endB1,
+                               std::vector<decltype(T1() * T2())> &result, size_t startResult) {
+        for (size_t i = startA0; i < endA1; ++i) {
+            for (size_t j = startB0; j < endB1; ++j) {
+                T aVal = (i < endA0 ? A[i] : A[i - (endA0 - startA0)]);
+                T bVal = (j < endB0 ? B[j] : B[j - (endB0 - startB0)]);
+                result[startResult + i + j - startA0 - startB0] += aVal * bVal;
+            }
+        }
+
+        // Subtract the terms that were added twice
+        for (size_t i = startA0; i < endA0; ++i) {
+            for (size_t j = startB0; j < endB0; ++j) {
+                result[startResult + i + j - startA0 - startB0] -= A[i] * B[j];
+            }
+        }
+
+        for (size_t i = startA1; i < endA1; ++i) {
+            for (size_t j = startB1; j < endB1; ++j) {
+                result[startResult + i + j - startA0 - startB0] -= A[i] * B[j];
+            }
+        }
+    }
 
 public:
 
@@ -164,8 +213,15 @@ public:
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
 
+
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b);
+    friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &A, const Polynomial<T2> &B) {
+        std::vector<decltype(T1() * T2())> result(A.coefficients.size() + B.coefficients.size() - 1, 0);
+        multiplyRec(A.coefficients, 0, A.coefficients.size(),
+                    B.coefficients, 0, B.coefficients.size(),
+                    result, 0);
+        return Polynomial<decltype(T1() * T2())>(result);
+    }
 
 };
 
@@ -535,15 +591,5 @@ Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Pol
     }
 }
 
-template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &a, const Polynomial<T2> &b) {
-    if (a.degree() + b.degree() < 5) { return a * b; }
-    auto polynomial_ref_pair = std::minmax(a, b,
-                                           [](const Polynomial<T1> &u, const Polynomial<T2> &v) {
-                                               return u.degree() < v.degree();
-                                           });
-
-    return Polynomial<decltype(T1() * T2())>();
-}
 
 #endif //POLYNOMIALSHPC_POLYNOMIALS_HPP
