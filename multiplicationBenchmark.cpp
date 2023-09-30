@@ -15,11 +15,20 @@ int main() {
     std::vector<int> v2{1, 0, 1};
     Polynomial<int> p2(v2);
     auto ans = fftmultiply(p1, p2);
+    auto cant = cantor(p1, p2);
     std::cout << p1 << std::endl;
     std::cout << p2 << std::endl;
     std::cout << ans << std::endl;
+    std::cout << cant << std::endl;
     std::cout << p1 * p2 << std::endl;
     std::cout << (ans == (p1 * p2)) << std::endl;
+    for (int i = 0; i < 50; ++i) {
+        auto R = generateRandomIntPolynomial(31, -1000, 1000); //above deg 31 cantor fails??
+        auto S = generateRandomIntPolynomial(100, -1000, 1000);
+        std::cout << (R * S == cantor(R, S)) << std::endl;
+
+    }
+
     Timer timer;
 
 

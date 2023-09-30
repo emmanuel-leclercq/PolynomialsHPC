@@ -32,7 +32,7 @@ int main() {
 
     cout << "constructing V from vector" << endl;
     vector<double> vector1{6.3, 3, 0, 1, 5};
-    SparsePolynomial<double> V(vector1, false);
+    SparsePolynomial<double> V(vector1);
     cout << "V: " << V << endl;
     V.adjust();
     cout << "V adjusted: " << V << endl;
@@ -41,7 +41,7 @@ int main() {
 
     cout << "constructing L from list<int>" << endl;
     list<int> list1{6, -3, 0, 1, 5};
-    SparsePolynomial<int> L(list1, false);
+    SparsePolynomial<int> L(list1);
     cout << "L: " << L << endl;
 
     cout << "constructing M from map<int,double>" << endl;
@@ -68,11 +68,12 @@ int main() {
     cout << "Testing addition M+P=" << M + P << endl;
     cout << "Testing subtraction M-P=" << M - P << endl;
     cout << "Testing subtraction P-M=" << P - M << endl;
+    cout << "Testing multiplication P*M=" << P * M << endl;
 
-    auto Q = generateRandomPolynomial(100, 0, 1);
+    auto Q = generateRandomIntPolynomial(100, 0, 1);
     cout << "Q and its degree: " << Q << ", " << Q.degree() << endl;
     cout << "Is Q sparse? " << Q.is_sparse() << endl;
-    SparsePolynomial<double> Q_sparse(Q, true);
+    SparsePolynomial<int> Q_sparse(Q, true);
     cout << "Q as sparse and its degree: " << Q_sparse << ", " << Q_sparse.degree() << endl;
     return 0;
 }

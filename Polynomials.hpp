@@ -117,6 +117,56 @@ private:
         }
     }
 
+    static void cantorRec(const std::vector<T> &A, size_t startA, size_t endA,
+                          const std::vector<T> &B, size_t startB, size_t endB,
+                          std::vector<T> &result, size_t startResult) {
+        size_t n = endA - startA;
+
+        if (n <= 32) {
+            // Base case: standard polynomial multiplication
+            for (size_t i = startA; i < endA; ++i) {
+                for (size_t j = startB; j < endB; ++j) {
+                    result[startResult + i + j - startA - startB] += A[i] * B[j];
+                }
+            }
+            return;
+        }
+
+        size_t m = n / 3;  // Divide size by three
+
+        // Split A and B into three parts each
+        size_t midA1 = startA + m, midA2 = startA + 2 * m;
+        size_t midB1 = startB + m, midB2 = startB + 2 * m;
+
+        // Compute intermediate products using Cantor's algorithm
+        cantorRec(A, startA, midA1, B, startB, midB1, result, startResult);
+        cantorRec(A, midA2, endA, B, midB2, endB, result, startResult + 2 * m);
+
+        std::vector<T> tempA(m), tempB(m);
+        for (size_t i = 0; i < m; ++i) {
+            tempA[i] = A[startA + i] + A[midA1 + i] - A[midA2 + i];
+            tempB[i] = B[startB + i] + B[midB1 + i] - B[midB2 + i];
+        }
+        cantorRec(tempA, 0, m, tempB, 0, m, result, startResult + m);
+
+        for (size_t i = 0; i < m; ++i) {
+            tempA[i] = A[startA + i] + A[midA1 + i];
+            tempB[i] = B[startB + i] + B[midB1 + i];
+        }
+        cantorRec(tempA, 0, m, tempB, 0, m, result, startResult);
+
+        for (size_t i = 0; i < m; ++i) {
+            tempA[i] = A[midA1 + i] - A[midA2 + i];
+            tempB[i] = B[midB1 + i] - B[midB2 + i];
+        }
+        cantorRec(tempA, 0, m, tempB, 0, m, result, startResult + 2 * m);
+
+        // Add/subtract intermediate results into the final result, adjusting coefficients
+        for (size_t i = 0; i < 2 * m; ++i) {
+            result[startResult + m + i] += result[startResult + i] - result[startResult + 2 * m + i];
+        }
+    }
+
 public:
 
 
@@ -214,15 +264,22 @@ public:
     friend Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
 
 
-    template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &A, const Polynomial<T2> &B) {
-        std::vector<decltype(T1() * T2())> result(A.coefficients.size() + B.coefficients.size() - 1, 0);
-        multiplyRec(A.coefficients, 0, A.coefficients.size(),
-                    B.coefficients, 0, B.coefficients.size(),
-                    result, 0);
-        return Polynomial<decltype(T1() * T2())>(result);
-    }
+//    template<typename T1, typename T2>
+//    friend Polynomial<decltype(T1() * T2())> karatsuba(const Polynomial<T1> &A, const Polynomial<T2> &B) {
+//        std::vector<decltype(T1() * T2())> result(A.coefficients.size() + B.coefficients.size() - 1, 0);
+//        multiplyRec(A.coefficients, 0, A.coefficients.size(),
+//                    B.coefficients, 0, B.coefficients.size(),
+//                    result, 0);
+//        return Polynomial<decltype(T1() * T2())>(result);
+//    }
 
+
+//    template<typename T1, typename T2>
+//    friend Polynomial<decltype(T1() * T2())> cantor(const Polynomial<T1> &a, const Polynomial<T2> &b){
+//                std::vector<decltype(T1() * T2())> result(a.coefficients.size() + b.coefficients.size() - 1, 0);
+//        cantorRec(a.coefficients, 0, a.coefficients.size(), b.coefficients, 0, b.coefficients.size(), result, 0);
+//        return Polynomial<decltype(T1() * T2())>(result);
+//    };
 };
 
 template<typename T>
@@ -445,15 +502,15 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
     /*
      * FFT multiplication is accurate for ints only, and become (much) faster for output degree>200
      */
-    if (std::is_same<decltype(T1() * T2()), int>::value && m>200) { return fftmultiply(p, q); }
+    if (std::is_same<decltype(T1() * T2()), int>::value && m > 200) { return fftmultiply(p, q); }
     else {
-    std::vector<decltype(T1() * T2())> coeffs(m + 1);
-    for (int i = 0; i <= p.degree(); ++i) {
-        for (int j = 0; j <= q.degree(); ++j) {
-            coeffs[i + j] += p[i] * q[j];
+        std::vector<decltype(T1() * T2())> coeffs(m + 1);
+        for (int i = 0; i <= p.degree(); ++i) {
+            for (int j = 0; j <= q.degree(); ++j) {
+                coeffs[i + j] += p[i] * q[j];
+            }
         }
-    }
-    return Polynomial<decltype(T1() * T2())>(std::move(coeffs));
+        return Polynomial<decltype(T1() * T2())>(std::move(coeffs));
     }
 }
 

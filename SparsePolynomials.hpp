@@ -45,7 +45,7 @@ template<typename T>
 SparsePolynomial<T> operator-(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
 template<typename T>
-SparsePolynomial<T> operator*(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+SparsePolynomial<T> operator*(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
 template<typename T>
 SparsePolynomial<T> operator/(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
@@ -60,7 +60,7 @@ template<typename T>
 SparsePolynomial<T> operator-=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
 template<typename T>
-SparsePolynomial<T> operator*=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+SparsePolynomial<T> operator*=(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
 template<typename T>
 SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
@@ -149,13 +149,13 @@ public:
      * Constructors assuming input is not 'sparse', which spears us
      * the need to know the degree beforehand
      */
-    explicit SparsePolynomial(const std::vector<T> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::vector<T> &coefficients);
 
-    explicit SparsePolynomial(const std::vector<T> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::vector<T> &&coefficients);
 
-    explicit SparsePolynomial(const std::list<T> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::list<T> &coefficients);
 
-    explicit SparsePolynomial(const std::list<T> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::list<T> &&coefficients);
 
 
     /* It makes more sense to use degrees as keys considering the
@@ -216,7 +216,7 @@ public:
 
     friend SparsePolynomial<T> operator-<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
-    friend SparsePolynomial<T> operator*<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+    friend SparsePolynomial<T> operator*<T>(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
     friend SparsePolynomial<T> operator/<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
@@ -226,7 +226,7 @@ public:
 
     friend SparsePolynomial<T> operator-=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
-    friend SparsePolynomial<T> operator*=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+    friend SparsePolynomial<T> operator*=<T>(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
     friend SparsePolynomial<T> operator/=<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
@@ -238,7 +238,25 @@ public:
  * without additional complexity?
 */
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients, bool sorted) {
+SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients) {
+    int index = coefficients.size();
+    n = index;
+    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
+                   [&index](const T &p) { return Monomial<T>(p, index--); });
+    is_sorted = true;
+}
+
+template<typename T>
+SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients) {
+    int index = coefficients.size();
+    n = index;
+    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
+                   [&index](T &p) { return Monomial<T>(std::move(p), index--); });
+    is_sorted = true;
+}
+
+template<typename T>
+SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients) {
     int index = coefficients.size();
     n = index;
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
@@ -246,27 +264,12 @@ SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients, bool s
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients, bool sorted) {
+SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients) {
     int index = coefficients.size();
     n = index;
     std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
                    [&index](T &p) { return Monomial<T>(std::move(p), index--); });
-}
-
-template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients, bool sorted) {
-    int index = coefficients.size();
-    n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](const T &p) { return Monomial<T>(p, index--); });
-}
-
-template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients, bool sorted) {
-    int index = coefficients.size();
-    n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](T &p) { return Monomial<T>(std::move(p), index--); });
+    is_sorted = true;
 }
 
 template<typename T>
@@ -383,6 +386,7 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
             monomials.emplace_back(P[index], index);
         }
     }
+    is_sorted = true;
 }
 
 template<typename T>
@@ -454,12 +458,36 @@ SparsePolynomial<T> operator-(const SparsePolynomial<T> &lhs, const SparsePolyno
 }
 
 template<typename T>
-SparsePolynomial<T> operator*(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
-    if (P.is_sorted && Q.is_sorted) {
+SparsePolynomial<T> operator*(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
+    if (!P.is_sorted) { P.reorder(); }
+    if (!Q.is_sorted) { Q.reorder(); }
 
-    } else {
+    SparsePolynomial<T> result;
 
+    for (const auto &monoP: P) {
+        for (const auto &monoQ: Q) {
+            T productCoeff = monoP.coeff() * monoQ.coeff();
+            int productDegree = monoP.degree() + monoQ.degree();
+
+            // Merge the term with the result
+            auto it = result.monomials.begin();
+            while (it != result.end() && it->degree() < productDegree) {
+                ++it;
+            }
+
+            if (it != result.end() && it->degree() == productDegree) {
+                it->coeff() += productCoeff; // add to the existing coefficient
+                if (it->coeff() == T(0)) {
+                    result.monomials.erase(it); // remove term if coefficient becomes zero
+                }
+            } else {
+                result.monomials.push_back(Monomial(productCoeff, productDegree));
+            }
+        }
     }
+    result.is_sorted = true;
+    return result;
+
 }
 
 template<typename T>
@@ -475,7 +503,7 @@ template<typename T>
 SparsePolynomial<T> operator-=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
 
 template<typename T>
-SparsePolynomial<T> operator*=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+SparsePolynomial<T> operator*=(SparsePolynomial<T> &, SparsePolynomial<T> &) {}
 
 template<typename T>
 SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}

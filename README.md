@@ -34,9 +34,9 @@ complexity for most operations, which is not always possible. We detail below th
 
 #### Operations available
 
-1. Addition (TODO)
-2. Subtraction (TODO)
-3. Multiplication (TODO)
+1. Addition
+2. Subtraction
+3. Multiplication
 4. Division (TODO)
 5. Evaluation (TODO)
 6. Factorization (TODO)
@@ -44,3 +44,7 @@ complexity for most operations, which is not always possible. We detail below th
 8. nth derivatives (TODO)
 9. Root finder (TODO)
 10. Plotting (TODO)
+
+
+#### Resources
+Modern Computer Algebra, Gathen & Gerhard
