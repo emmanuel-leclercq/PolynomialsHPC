@@ -119,3 +119,7 @@ void fft(std::vector<std::complex<double>> &a, bool invert) {
             x /= n;
     }
 }
+
+constexpr bool IsPowerOf2(const size_t value) {
+    return value && (!(value & (value - 1)));
+}

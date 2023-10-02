@@ -491,7 +491,26 @@ SparsePolynomial<T> operator*(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
 }
 
 template<typename T>
-SparsePolynomial<T> operator/(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
+SparsePolynomial<T> operator/(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
+    SparsePolynomial<T> quotient;
+    auto remainder = P;
+
+    while (!remainder.empty() && remainder.back().second >= Q.back().second) {
+        T leadCoeff = remainder.back().first / Q.back().first;
+        int leadDegree = remainder.back().second - Q.back().second;
+
+        Polynomial<T> term = {{leadCoeff, leadDegree}};
+        quotient.push_back({leadCoeff, leadDegree});
+
+        Polynomial<T> product;
+        for (const auto &mono: Q) {
+            product.push_back({mono.coeff() * leadCoeff, mono.degree() + leadDegree});
+        }
+
+        remainder = subtract(remainder, product);
+    }
+    return quotient;
+}
 
 template<typename T>
 SparsePolynomial<T> operator%(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
