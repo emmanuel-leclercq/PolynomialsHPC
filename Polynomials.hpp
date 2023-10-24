@@ -209,6 +209,9 @@ public:
     template<typename U>
     T operator()(const U &) const;
 
+    template<typename U>
+    std::vector<T> operator()(const std::vector<U> &) const;
+
     [[nodiscard]] std::vector<T> multipointEval(const std::vector<T> &points) const;
 
 
@@ -280,7 +283,21 @@ public:
 //        cantorRec(a.coefficients, 0, a.coefficients.size(), b.coefficients, 0, b.coefficients.size(), result, 0);
 //        return Polynomial<decltype(T1() * T2())>(result);
 //    };
+
+
+    template<typename U>
+    Polynomial<T> interpolate(const std::vector<U> &);
 };
+
+template<typename T>
+template<typename U>
+Polynomial<T> Polynomial<T>::interpolate(const std::vector<U> &points) {
+    if (points.size() == 0) { return Polynomial<T>(); }
+    if (points.size() == 1) { return Polynomial<T>(points[0]); }
+    else{
+
+    }
+}
 
 template<typename T>
 Polynomial<T>::Polynomial(const std::vector<T> &roots, bool fromRoots) {
@@ -318,6 +335,12 @@ T Polynomial<T>::operator()(const U &x) const {
         return res;
     } else if (n == 0) return coefficients[0];
     else return 0;
+}
+
+template<typename T>
+template<typename U>
+std::vector<T> Polynomial<T>::operator()(const std::vector<U> &) const {
+    return std::vector<T>();
 }
 
 template<typename T>

@@ -5,9 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 # add_library(${PROJECT_NAME} SHARED Polynomials.cpp)
 
-add_executable(Dense TestPolynomial.cpp)
+#add_executable(Dense TestPolynomial.cpp)
 
 add_executable(Sparse TestSparsePolynomial.cpp)
 
-add_executable(bench multiplicationBenchmark.cpp)
+#add_executable(bench multiplicationBenchmark.cpp)
 
