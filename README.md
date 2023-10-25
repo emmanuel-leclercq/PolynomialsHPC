@@ -1,6 +1,8 @@
 # PolynomialsHPC
 
-This is an attempt to build a headers-only high performance polynomial functions libraries, single parameter for now.
+This is an attempt to build a headers-only high performance single-variable polynomial functions libraries, 
+over any ring (the ring doesn't have to be compatible with the Fourier transform). The dense polynomial
+class serves as a benchmark for the sparse polynomial class, which aims to achieve better memory performances.
 
 ### Polynomial (dense) class
 

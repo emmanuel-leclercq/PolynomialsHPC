@@ -41,11 +41,11 @@ int main() {
     cout << "p2 : " << p2 << endl;
     cout << endl;
 
-    Polynomial<double> withRoots({1, 2, 3}, true);
-    cout << "Building polynomial from roots 1,2,3: " << withRoots << endl << endl;
-    std::vector<double> points{1, 2, 3};
+    Polynomial<double> withRoots({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, true);
+    cout << "Building polynomial from roots 1,2,3,...,12: " << withRoots << endl << endl;
+    std::vector<double> points{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
     auto ans{withRoots.multipointEval(points)};
-    cout << "checking correctness with multipoint evaluation:";
+    cout << "checking correctness with multipoint evaluation: ";
     for (auto x: ans) { cout << x << " "; }
     cout << endl << endl;
 
@@ -69,8 +69,8 @@ int main() {
     cout << "Remainder : " << remainder << endl;
     cout << endl;
     // function evaluation
-    cout << "p1(2) : " << p1(2) << endl
-         << "p2(3) : " << p2(3) << endl;
+    cout << "p1(2) : " << p1(2) << endl;
+    cout << "p2(3) : " << p2(3) << endl;
     cout << endl;
 
     //derivative and antiderivative
@@ -96,14 +96,14 @@ int main() {
 
     cout << "P : " << P << endl;
     cout << "Q : " << Q << endl;
-
-    auto start = std::chrono::high_resolution_clock::now();
+    Timer timer;
+    timer.start();
     auto dom = (P * Q).dominant();
-    auto end = std::chrono::high_resolution_clock::now();
-    auto timing = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    timer.finish();
     cout << "Dominant coefficient of random polynomial product : " << dom << endl;
-
     cout << "Time it takes for the product : ";
-    cout << timing << "ms" << endl;
+    cout << timer() << "ms" << endl;
+    cout << endl;
+
     return 0;
 }

@@ -3,6 +3,21 @@
 
 #include <complex>
 
+class Timer {
+    std::chrono::time_point<std::chrono::steady_clock> timePoint;
+    size_t value;
+public:
+    void start() { timePoint = std::chrono::steady_clock::now(); }
+
+    void finish() {
+        auto curr = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(curr - timePoint);
+        value = elapsed.count();
+    }
+
+    size_t operator()() const { return value; }
+};
+
 template<typename T>
 bool is_zero(T a) {
     return (static_cast<int>(a) == 0);
@@ -65,21 +80,6 @@ bool should_add_plus(const std::complex<T> &z) {
     return true;
 }
 
-class Timer {
-    std::chrono::time_point<std::chrono::steady_clock> timePoint;
-    size_t value;
-public:
-    void start() { timePoint = std::chrono::steady_clock::now(); }
-
-    void finish() {
-        auto curr = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(curr - timePoint);
-        value = elapsed.count();
-    }
-
-    size_t operator()() const { return value; }
-};
-
 int reverse(int num, int lg_n) {
     int res = 0;
     for (int i = 0; i < lg_n; i++) {
@@ -122,4 +122,9 @@ void fft(std::vector<std::complex<double>> &a, bool invert) {
 
 constexpr bool IsPowerOf2(const size_t value) {
     return value && (!(value & (value - 1)));
+}
+
+template<typename T>
+void coutVect(std::ostream &os, const std::vector<T> &v) {
+    for (auto x: v) { os << x << " "; }
 }

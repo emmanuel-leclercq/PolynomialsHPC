@@ -212,8 +212,7 @@ public:
     template<typename U>
     std::vector<T> operator()(const std::vector<U> &) const;
 
-    [[nodiscard]] std::vector<T> multipointEval(const std::vector<T> &points) const;
-
+    std::vector<T> multipointEval(const std::vector<T> &points) const;
 
     void derivative(int k = 1);
 
@@ -294,7 +293,7 @@ template<typename U>
 Polynomial<T> Polynomial<T>::interpolate(const std::vector<U> &points) {
     if (points.size() == 0) { return Polynomial<T>(); }
     if (points.size() == 1) { return Polynomial<T>(points[0]); }
-    else{
+    else {
 
     }
 }
@@ -339,40 +338,53 @@ T Polynomial<T>::operator()(const U &x) const {
 
 template<typename T>
 template<typename U>
-std::vector<T> Polynomial<T>::operator()(const std::vector<U> &) const {
-    return std::vector<T>();
+std::vector<T> Polynomial<T>::operator()(const std::vector<U> &v) const {
+    return multipointEval(v);
 }
 
 template<typename T>
 std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const {
-    /*
-     * Algorithm inspired by Modern Computer Algebra - Joachim von zur Gathen, Jürgen Gerhard  (2013)
-     */
-
     int m = points.size();
-    if (m == 1) {
-        return std::vector<T>{this->operator()(points[0])};
-    }
+    std::vector<T> ans(m);
+    std::transform(points.begin(), points.end(), ans.begin(), [this](const T &x) { return this->operator()(x); });
+    return ans;
 
-    //Splitting in half
-    std::vector<T> pointsLeft(points.begin(), points.begin() + m / 2);
-    std::vector<T> pointsRight(points.begin() + m / 2, points.end());
-
-    // Construct polynomials from roots
-    Polynomial<T> Q1(pointsLeft, true);
-    Polynomial<T> Q2(pointsRight, true);
-
-    // Compute remainders
-    auto pair = euclid_div(*this, Q1 * Q2);
-    Polynomial<T> remainderQ1 = (*this) % Q1;
-    Polynomial<T> remainderQ2 = (*this) % Q2;
-
-    // Merge results
-    std::vector<T> results = pair.first.multipointEval(pointsLeft);
-    std::vector<T> rightResults = pair.second.multipointEval(pointsRight);
-    results.insert(results.end(), rightResults.begin(), rightResults.end());
-    return results;
 }
+
+
+//template<typename T>
+//std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const {
+//    /*
+//     * Algorithm inspired by Modern Computer Algebra - Joachim von zur Gathen, Jürgen Gerhard  (2013)
+//     * this is much slower than using Horner n times unfortunately...
+//     */
+//
+//    int m = points.size();
+//    if (m <= 10) {
+//        std::vector<T> ans(m);
+//        std::transform(points.begin(), points.end(), ans.begin(), [this](const T &x) { return this->operator()(x); });
+//        return ans;
+//    }
+//
+//    //Splitting in half
+//    std::vector<T> pointsLeft(points.begin(), points.begin() + m / 2);
+//    std::vector<T> pointsRight(points.begin() + m / 2, points.end());
+//
+//    // Construct polynomials from roots
+//    Polynomial<T> Q1(pointsLeft, true);
+//    Polynomial<T> Q2(pointsRight, true);
+//
+//    // Compute remainders
+////    auto pair = euclid_div(*this, Q1 * Q2);
+//    Polynomial<T> remainderQ1 = (*this) % Q1;
+//    Polynomial<T> remainderQ2 = (*this) % Q2;
+//
+//    // Merge results
+//    std::vector<T> results = Q1.multipointEval(pointsLeft);
+//    std::vector<T> rightResults = Q2.multipointEval(pointsRight);
+//    results.insert(results.end(), rightResults.begin(), rightResults.end());
+//    return results;
+//}
 
 Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
     std::random_device rd;
