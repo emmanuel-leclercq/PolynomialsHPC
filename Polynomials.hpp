@@ -375,7 +375,6 @@ std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const
 //    Polynomial<T> Q2(pointsRight, true);
 //
 //    // Compute remainders
-////    auto pair = euclid_div(*this, Q1 * Q2);
 //    Polynomial<T> remainderQ1 = (*this) % Q1;
 //    Polynomial<T> remainderQ2 = (*this) % Q2;
 //

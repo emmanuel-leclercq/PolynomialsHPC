@@ -190,7 +190,15 @@ public:
     //  Default destructor will be used, standard data types
     ~SparsePolynomial() = default;
 
-    [[nodiscard]] int degree() const { return n; }
+    [[nodiscard]] int degree() const {
+        if (is_sorted) { return n; }
+        else {
+            return *std::max_element(monomials.begin(), monomials.end(), [](const Monomial<T> &a,
+                                                                            const Monomial<T> &b) {
+                return a.degree() < b.degree();
+            });
+        }
+    }
 
     [[nodiscard]] Monomial<T> dominant() const { return *monomials.begin(); }
 
@@ -209,6 +217,8 @@ public:
 
     auto end() const { return monomials.end(); }
 
+    void add(const Monomial<T> &m) { monomials.push_back(m); }
+
     friend std::ostream &operator
     <<<>(std::ostream &, const SparsePolynomial<T> &);
 
@@ -217,6 +227,8 @@ public:
     friend SparsePolynomial<T> operator-<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
     friend SparsePolynomial<T> operator*<T>(SparsePolynomial<T> &, SparsePolynomial<T> &);
+
+    friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>> euclid_div(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
     friend SparsePolynomial<T> operator/<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
@@ -491,23 +503,32 @@ SparsePolynomial<T> operator*(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
 }
 
 template<typename T>
+std::pair<SparsePolynomial<T>, SparsePolynomial<T>> euclid_div(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
+    SparsePolynomial<T> quotient;
+    auto remainder = P;
+    while (!remainder.monomials.empty() && remainder.monomials.back().degree() >= Q.monomials.back().degree()) {
+
+    }
+
+    return std::pair<SparsePolynomial<T>, SparsePolynomial<T>>(quotient, remainder);
+}
+
+template<typename T>
 SparsePolynomial<T> operator/(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
     SparsePolynomial<T> quotient;
     auto remainder = P;
 
-    while (!remainder.empty() && remainder.back().second >= Q.back().second) {
-        T leadCoeff = remainder.back().first / Q.back().first;
-        int leadDegree = remainder.back().second - Q.back().second;
+    while (!remainder.monomials.empty() && remainder.monomials.back().degree() >= Q.monomials.back().degree()) {
+        T leadCoeff = remainder.monomials.back().coeff() / Q.monomials.back().coeff();
+        int leadDegree = remainder.monomials.back().degree() - Q.monomials.back().degree();
+        quotient.monomials.push_back(Monomial<T>{leadCoeff, leadDegree});
 
-        Polynomial<T> term = {{leadCoeff, leadDegree}};
-        quotient.push_back({leadCoeff, leadDegree});
-
-        Polynomial<T> product;
+        SparsePolynomial<T> product;
         for (const auto &mono: Q) {
-            product.push_back({mono.coeff() * leadCoeff, mono.degree() + leadDegree});
+            product.monomials.push_back(Monomial<T>{mono.coeff() * leadCoeff, mono.degree() + leadDegree});
         }
 
-        remainder = subtract(remainder, product);
+        remainder = remainder - product;
     }
     return quotient;
 }
@@ -522,7 +543,9 @@ template<typename T>
 SparsePolynomial<T> operator-=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
 
 template<typename T>
-SparsePolynomial<T> operator*=(SparsePolynomial<T> &, SparsePolynomial<T> &) {}
+SparsePolynomial<T> operator*=(SparsePolynomial<T> &A, SparsePolynomial<T> &B) {
+    return A * B;
+}
 
 template<typename T>
 SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomial<T> &) {}
