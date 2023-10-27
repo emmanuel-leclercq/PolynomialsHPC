@@ -83,7 +83,14 @@ int main() {
     cout << "test derivative(p1) = " << derivative<double>(p3) << endl;
     cout << "test derivative(p1,-1) = " << derivative<double>(p3, -1) << endl;
     cout << endl;
-
+    cout << "Test interpolation (0,0), (1,1) (3,9): ";
+    vector<std::pair<double, double>> data = {{0, 0},
+                                              {2, 4},
+                                              {4, 16}};
+    auto interpolation = interpolate<double>({{0, 0},
+                                              {2, 4},
+                                              {4, 16}});
+    cout << interpolation << endl;
     // Random polynomials generation
     auto P = generateRandomIntPolynomial(100, 0, 1);
 

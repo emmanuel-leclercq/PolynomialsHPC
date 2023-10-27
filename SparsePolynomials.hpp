@@ -190,15 +190,16 @@ public:
     //  Default destructor will be used, standard data types
     ~SparsePolynomial() = default;
 
-    [[nodiscard]] int degree() const {
-        if (is_sorted) { return n; }
-        else {
-            return *std::max_element(monomials.begin(), monomials.end(), [](const Monomial<T> &a,
-                                                                            const Monomial<T> &b) {
-                return a.degree() < b.degree();
-            });
-        }
-    }
+//    [[nodiscard]] int degree() const {
+//        if (is_sorted) { return n; }
+//        else {
+//            return std::max_element(monomials.begin(), monomials.end(), [](const Monomial<T> &a,
+//                                                                           const Monomial<T> &b) {
+//                return a.degree() < b.degree();
+//            })->degree();
+//        }
+//    }
+    [[nodiscard]] int degree() const { return n; };
 
     [[nodiscard]] Monomial<T> dominant() const { return *monomials.begin(); }
 

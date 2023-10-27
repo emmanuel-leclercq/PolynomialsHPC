@@ -200,6 +200,12 @@ public:
 //  Destructor
     ~Polynomial() = default;
 
+
+//    iterators
+    auto begin() const { return coefficients.begin(); }
+
+    auto end() const { return coefficients.end(); }
+
 //  Basic accessors/mutators
     [[nodiscard]] int degree() const { return n; }
 
@@ -284,17 +290,29 @@ public:
 //    };
 
 
-    template<typename U>
-    Polynomial<T> interpolate(const std::vector<U> &);
 };
 
 template<typename T>
-template<typename U>
-Polynomial<T> Polynomial<T>::interpolate(const std::vector<U> &points) {
+Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
     if (points.size() == 0) { return Polynomial<T>(); }
-    if (points.size() == 1) { return Polynomial<T>(points[0]); }
+    if (points.size() == 1) { return Polynomial<T>(points[0].second); }
     else {
-
+        std::vector<T> ans(points.size(), 0);
+        for (int i = 0; i < points.size(); i++) {
+            double L = 1.0;
+            for (int j = 0; j < points.size(); j++) {
+                if (i != j) {
+                    L *= (points[i].first - points[j].first);
+                }
+            }
+            for (int j = 0; j < points.size(); j++) {
+                if (i != j) {
+                    double factor = points[i].second / (points[i].first - points[j].first);
+                    ans[j] += factor / L;
+                }
+            }
+        }
+        return Polynomial<T>(ans);
     }
 }
 
