@@ -1,6 +1,7 @@
 #ifndef POLYNOMIALSHPC_POLYNOMIALS_HPP
 #define POLYNOMIALSHPC_POLYNOMIALS_HPP
 
+#include <type_traits>
 #include <vector>
 #include <random>
 #include <complex>
@@ -555,7 +556,7 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
     /*
      * FFT multiplication is accurate for ints only, and become (much) faster for output degree>200
      */
-    if (std::is_same<decltype(T1() * T2()), int>::value && m > 200) { return fftmultiply(p, q); }
+    if (std::is_integral<decltype(T1() * T2())>::value && m > 200) { return fftmultiply(p, q); }
     else {
         std::vector<decltype(T1() * T2())> coeffs(m + 1);
         for (int i = 0; i <= p.degree(); ++i) {
