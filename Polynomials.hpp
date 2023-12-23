@@ -218,6 +218,7 @@ public:
     template<typename U>
     std::vector<T> operator()(const std::vector<U> &) const;
 
+    //O(n^2), will try sub quadratic algo with FFT, also need to switch to templated input vect type
     std::vector<T> multipointEval(const std::vector<T> &points) const;
 
     void derivative(int k = 1);
