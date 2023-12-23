@@ -1,3 +1,5 @@
+// TestSparsePolynomial.cpp
+
 #include "SparsePolynomials.hpp"
 #include "Polynomials.hpp"
 #include <iostream>
@@ -15,7 +17,7 @@ int main() {
      * testing Monomial implementation
     */
     Monomial<int> m;
-    Monomial<int> m1(1, 2);
+    Monomial<int> m1(2, 2);
     Monomial<int> m2(1, 3);
     cout << "m1: " << m1 << endl;
     cout << "m1<m2 in terms of degree? " << (m1 < m2) << endl;
@@ -64,19 +66,67 @@ int main() {
     Polynomial<double> poly1(vector1);
     cout << "dense version: " << poly1 << endl;
     SparsePolynomial<double> P(poly1, false);
-    cout << "P: " << P << endl;
+    cout << "Sparse version P: " << P << endl;
+
+    SparsePolynomial<int> R;
+    R.add({1, 5});
+    R.add({1, 2});
+    R.add({3, 0});
+    cout << "R: " << R << endl;
+    SparsePolynomial<int> S;
+    S.add({3, 3});
+    S.add({-1, 0});
+    cout << "S: " << S << endl;
+    cout << "R*S: " << R * S.adjust() << endl;
+
     cout << "Testing addition M+P=" << M + P << endl;
+    cout << "Testing addition P+M=" << P + M << endl;
+    cout << "testing heap addition M+P=" << heap_plus<double>(M, P) << endl;
     cout << "Testing subtraction M-P=" << M - P << endl;
     cout << "Testing subtraction P-M=" << P - M << endl;
     cout << "Testing multiplication P*M=" << P * M << endl;
-    cout << "Testing division M/P=" << M / P << endl;
+//    cout << "Testing division M/P=" << M / P << endl;
 //    cout << "Testing division M%P=" << M % P << endl;
 
+    //profiling addition
+//    auto A_dense=generateRandomIntPolynomial(100, 0, 1);
+//    auto A_sparse=SparsePolynomial<int>(A_dense, false);
+//    auto B_dense=generateRandomIntPolynomial(100, 0, 1);
+//    auto B_sparse=SparsePolynomial<int>(B_dense, false);
+//    Timer timer;
+//    timer.start();
+//    A_sparse+B_sparse;
+//    timer.finish();
+//    cout<<"classic addition time: "<<timer()<<endl;
+//    timer.start();
+//    heap_plus<int>(A_sparse, B_sparse);
+//    timer.finish();
+//    cout<<"heap addition time: "<<timer()<<endl;
+//
+//    unsigned long long brute=0, heap=0;
+//    for (int i = 0; i < 100; ++i) {
+//        //average time of addition brute force versus heap:
+//        auto A_dense=generateRandomIntPolynomial(1000, 0, 1);
+//        auto A_sparse=SparsePolynomial<int>(A_dense, false);
+//        auto B_dense=generateRandomIntPolynomial(1000, 0, 1);
+//        auto B_sparse=SparsePolynomial<int>(B_dense, false);
+//        Timer timer;
+//        timer.start();
+//        A_sparse+B_sparse;
+//        timer.finish();
+//        brute+=timer();
+//        timer.start();
+//        heap_plus<int>(A_sparse, B_sparse);
+//        timer.finish();
+//        heap+=timer();
+//    }
+//    cout<<"average time of addition brute force versus heap: "<<brute/100<<" "<<heap/100<<endl;
 
     auto Q = generateRandomIntPolynomial(100, 0, 1);
     cout << "Q and its degree: " << Q << ", " << Q.degree() << endl;
     cout << "Is Q sparse? " << Q.is_sparse() << endl;
     SparsePolynomial<int> Q_sparse(Q, true);
     cout << "Q as sparse and its degree: " << Q_sparse << ", " << Q_sparse.degree() << endl;
+
     return 0;
 }

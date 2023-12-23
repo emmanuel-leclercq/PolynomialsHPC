@@ -1,4 +1,4 @@
-//
+// SparsePolynomials.hpp
 // Created by Emmanuel Leclercq on 24/08/2023.
 //
 
@@ -9,6 +9,8 @@
 #include <list>
 #include <map>
 #include <unordered_map>
+#include <queue>
+#include <utility>
 #include <algorithm>
 #include "utils.hpp"
 #include "Polynomials.hpp"
@@ -25,9 +27,11 @@ bool operator<(const Monomial<T> &u, const Monomial<Y> &v) { return u.n < v.n; }
 template<typename T, typename Y>
 bool operator==(const Monomial<T> &u, const Monomial<Y> &v) { return u.n == v.n && u.coeff() == v.coeff(); }
 
-
 template<typename T, typename Y>
 bool operator==(const Monomial<T> &u, const Y &t) { return u.coeff() == t; }
+
+template<typename T1, typename T2>
+Monomial<T1> operator*(const Monomial<T1> &lhs, const Monomial<T2> &rhs){return Monomial<T1>(lhs.coeff() * rhs.coeff(), lhs.degree() + rhs.degree());}
 
 template<typename T>
 std::ostream &operator<<(std::ostream &, const Monomial<T> &);
@@ -68,6 +72,11 @@ SparsePolynomial<T> operator/=(const SparsePolynomial<T> &, const SparsePolynomi
 template<typename T>
 SparsePolynomial<T> operator%=(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
+template<typename T>
+SparsePolynomial<T> heap_plus(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs);
+
+template<typename T>
+SparsePolynomial<T> heap_mult(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs);
 
 /*
  * Definition of the parent class monomial and all its methods
@@ -81,9 +90,9 @@ private:
 public:
     Monomial() : coefficient(0), n(-1) {}
 
-    explicit Monomial(const T &a, const int &m = 0) : coefficient(a), n(m) {}
+     Monomial(const T &a, const int &m = 0) : coefficient(a), n(m) {}
 
-    explicit Monomial(const T &&a, const int &m = 0) : coefficient(a), n(m) {}
+     Monomial(const T &&a, const int &m = 0) : coefficient(a), n(m) {}
 
     /*
      * Ordering by degree
@@ -96,6 +105,9 @@ public:
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Monomial<T> &);
+
+    template<typename T1, typename T2>
+    friend Monomial<T1> operator*(const Monomial<T1> &lhs, const Monomial<T2> &rhs);
 
     T coeff() const { return coefficient; }
 
@@ -220,6 +232,14 @@ public:
 
     void add(const Monomial<T> &m) { monomials.push_back(m); }
 
+    template<typename U>
+    T operator()(const U &) const;
+
+    //TO BE REMOVED
+    friend SparsePolynomial<T> heap_plus<T>(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs);
+
+    friend SparsePolynomial<T> heap_mult(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs);
+
     friend std::ostream &operator
     <<<>(std::ostream &, const SparsePolynomial<T> &);
 
@@ -229,7 +249,8 @@ public:
 
     friend SparsePolynomial<T> operator*<T>(SparsePolynomial<T> &, SparsePolynomial<T> &);
 
-    friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>> euclid_div(SparsePolynomial<T> &, SparsePolynomial<T> &);
+    friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
+    euclid_div(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
     friend SparsePolynomial<T> operator/<T>(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
 
@@ -403,6 +424,16 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
 }
 
 template<typename T>
+template<typename U>
+T SparsePolynomial<T>::operator()(const U &x) const {
+    T result = 0;
+    for (const auto &m: monomials) {
+        result += m.coeff() * std::pow(x, m.degree());
+    }
+    return result;
+}
+
+template<typename T>
 std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
     for (auto it = P.monomials.begin(); it != P.monomials.end(); ++it) {
         out << *it;
@@ -463,6 +494,42 @@ SparsePolynomial<T> operator+(const SparsePolynomial<T> &lhs, const SparsePolyno
 }
 
 template<typename T>
+SparsePolynomial<T> heap_plus(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs) {
+    std::priority_queue<Monomial<T>> heap;
+    SparsePolynomial<T> result;
+
+    for (const auto &mono: lhs) {
+        heap.push(mono);
+    }
+    for (const auto &mono: rhs) {
+        heap.push(mono);
+    }
+
+    while (!heap.empty()) {
+        Monomial<T> current = heap.top();
+        heap.pop();
+
+        // Combine terms with the same exponent
+        while (!heap.empty() && heap.top().degree() == current.degree()) {
+            current.coeff() += heap.top().coeff();
+            heap.pop();
+        }
+
+        if (current.coeff() != T(0)) { // Ignore zero coefficient
+            result.monomials.push_back(current);
+        }
+    }
+    return result;
+}
+
+template<typename T>
+SparsePolynomial<T> heap_mult(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs) {
+    std::priority_queue<Monomial<T>> heap;
+    SparsePolynomial<T> result;
+    return result;
+}
+
+template<typename T>
 SparsePolynomial<T> operator-(const SparsePolynomial<T> &lhs, const SparsePolynomial<T> &rhs) {
     SparsePolynomial<T> result(rhs);
     std::transform(result.monomials.begin(), result.monomials.end(), result.monomials.begin(),
@@ -504,7 +571,8 @@ SparsePolynomial<T> operator*(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
 }
 
 template<typename T>
-std::pair<SparsePolynomial<T>, SparsePolynomial<T>> euclid_div(SparsePolynomial<T> &P, SparsePolynomial<T> &Q) {
+std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
+euclid_div(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
     SparsePolynomial<T> quotient;
     auto remainder = P;
     while (!remainder.monomials.empty() && remainder.monomials.back().degree() >= Q.monomials.back().degree()) {

@@ -24,7 +24,6 @@ Addition between non-ordered sparse polynomials results in a sorted sparse polyn
 8. nth derivatives: includes antiderivative (n<0), both derivative and antiderivative are O(n), we use a swap trick for
    the latter. Two implementations -> P.derivative() and derivative(P) for convenience (the latter doesn't modify P)
 9. Root finder (TODO)
-10. Plotting (TODO)
 
 ### Sparse Polynomial class
 
@@ -45,7 +44,6 @@ complexity for most operations, which is not always possible. We detail below th
 7. Interpolation (TODO)
 8. nth derivatives (TODO)
 9. Root finder (TODO)
-10. Plotting (TODO)
 
 
 #### Resources
