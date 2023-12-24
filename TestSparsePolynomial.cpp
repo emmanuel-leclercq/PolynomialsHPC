@@ -77,11 +77,10 @@ int main() {
     S.add({3, 3});
     S.add({-1, 0});
     cout << "S: " << S << endl;
-    cout << "R*S: " << R * S.adjust() << endl;
+    cout << "R*S: " << R * S << endl;
 
     cout << "Testing addition M+P=" << M + P << endl;
     cout << "Testing addition P+M=" << P + M << endl;
-    cout << "testing heap addition M+P=" << heap_plus<double>(M, P) << endl;
     cout << "Testing subtraction M-P=" << M - P << endl;
     cout << "Testing subtraction P-M=" << P - M << endl;
     cout << "Testing multiplication P*M=" << P * M << endl;
