@@ -32,7 +32,7 @@ Unlike the dense polynomial class, we store coefficients in a linked list (x^999
 (coefficient, degree) in a list instead of a 1000-sized vector).
 Assuming t is the number of elements in the list representing a sparse polynomial, our goal is to approach O(t)
 complexity for most operations, which is not always possible. In fact, some operations are simply not possible,
-such as factorization (except for small degree polynomials).
+such as factorization (except for specific cases).
 
 #### Operations available
 
