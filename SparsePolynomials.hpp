@@ -42,6 +42,13 @@ template<typename T>
 class SparsePolynomial;
 
 template<typename T>
+SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k = 1);
+
+template<typename T1, typename T2>
+std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
+heap_div(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+
+template<typename T>
 std::ostream &operator<<(std::ostream &, const SparsePolynomial<T> &);
 
 template<typename T1, typename T2>
@@ -231,8 +238,16 @@ public:
     template<typename U>
     T operator()(const U &) const;
 
+    void derivative(int k = 1);
+
+    friend SparsePolynomial<T> derivative<T>(SparsePolynomial<T> P, int k);
+
     friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
     euclid_div(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+
+    template<typename T1, typename T2>
+    friend std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
+    heap_div(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
 
     friend std::ostream &operator
     <<<>(std::ostream &, const SparsePolynomial<T> &);
@@ -435,6 +450,37 @@ SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsit
 }
 
 template<typename T>
+void SparsePolynomial<T>::derivative(int k) {
+    if (k == 0) { return; }
+    if (degree() < k) {
+        *this = SparsePolynomial<T>();
+        return;
+    }
+    if (k < 0) {
+        for (auto it = monomials.begin(); it != monomials.end(); it++) {
+            it->coeff() /= rangeProduct<T>(it->degree() + 1, it->degree() - k);
+            it->degree() -= k;
+        }
+        n -= k;
+    } else {
+        while (monomials.back().degree() < k) {
+            monomials.pop_back();
+        }
+        for (auto it = monomials.begin(); it != monomials.end(); it++) {
+            it->coeff() *= rangeProduct<T>(it->degree() - k + 1, it->degree());
+            it->degree() -= k;
+        }
+        n -= k;
+    }
+}
+
+template<typename T>
+SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k) {
+    P.derivative(k);
+    return P;
+}
+
+template<typename T>
 template<typename U>
 T SparsePolynomial<T>::operator()(const U &x) const {
     T result = 0;
@@ -545,6 +591,16 @@ euclid_div(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
     }
 
     return std::pair<SparsePolynomial<T>, SparsePolynomial<T>>(quotient, remainder);
+}
+
+template<typename T1, typename T2>
+std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
+heap_div(const SparsePolynomial<T1> &dividend, const SparsePolynomial<T2> &divisor) {
+    SparsePolynomial<decltype(T1() * T2())> quotient;
+    SparsePolynomial<decltype(T1() * T2())> remainder = dividend;
+    std::priority_queue<Monomial<decltype(T1() * T2())>> heap;
+    while (!heap.empty()) {}
+    return {quotient, remainder};
 }
 
 template<typename T1, typename T2>

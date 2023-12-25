@@ -1,6 +1,6 @@
 # PolynomialsHPC
 
-This is an attempt to build a headers-only high performance single-variable polynomial functions libraries, 
+This is an attempt to build a headers-only high performance single-variable polynomial functions libraries,
 over any ring (the ring doesn't have to be compatible with the Fourier transform). The dense polynomial
 class serves as a benchmark for the sparse polynomial class, which aims to achieve better memory performances.
 
@@ -28,23 +28,22 @@ Addition between non-ordered sparse polynomials results in a sorted sparse polyn
 ### Sparse Polynomial class
 
 A polynomial is considered sparse when more than half its coefficients are zeros.
-Unlike the dense polynomial class, we store coefficients in a linked list (x^999+1 is stored in a 2-elements lists
-instead of a 1000 elements vector).
+Unlike the dense polynomial class, we store coefficients in a linked list (x^999+1 is stored as two pairs
+(coefficient, degree) in a list instead of a 1000-sized vector).
 Assuming t is the number of elements in the list representing a sparse polynomial, our goal is to approach O(t)
-complexity for most operations, which is not always possible. We detail below the implementations (TODO)
+complexity for most operations, which is not always possible. In fact, some operations are simply not possible,
+such as factorization (except for small degree polynomials).
 
 #### Operations available
 
 1. Addition
 2. Subtraction
-3. Multiplication
+3. Multiplication (Johnson, Monagan, Pearce heap algorithm)
 4. Division (TODO)
 5. Evaluation (TODO)
-6. Factorization (TODO)
-7. Interpolation (TODO)
-8. nth derivatives (TODO)
-9. Root finder (TODO)
-
+6. nth derivatives
+7. Root finder (TODO)
 
 #### Resources
+
 Modern Computer Algebra, Gathen & Gerhard

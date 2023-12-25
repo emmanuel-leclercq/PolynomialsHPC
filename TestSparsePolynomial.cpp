@@ -67,6 +67,15 @@ int main() {
     cout << "dense version: " << poly1 << endl;
     SparsePolynomial<double> P(poly1, false);
     cout << "Sparse version P: " << P << endl;
+    cout << "Testing copy 2nd derivative: P'=" << derivative<double>(P, 2) << endl;
+    P.derivative();
+    cout << "Testing derivative P=" << P << endl;
+    P.derivative(-1);
+    cout << "Testing antiderivative P=" << P << endl;
+    P.derivative(3);
+    cout << "Testing 3rd derivative P=" << P << endl;
+    P.derivative(-4);
+    cout << "Testing 4th antiderivative P=" << P << endl;
 
     SparsePolynomial<int> R;
     R.add({1, 5});
