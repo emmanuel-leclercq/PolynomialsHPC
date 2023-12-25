@@ -49,7 +49,7 @@ template<typename T>
 std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
 
 template<typename T>
-Polynomial<T> derivative(const Polynomial<T> &P, int k = 1);
+Polynomial<T> derivative( Polynomial<T> P, int k = 1);
 
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
@@ -268,7 +268,7 @@ public:
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
 
-    friend Polynomial<T> derivative<T>(const Polynomial<T> &P, int k);
+    friend Polynomial<T> derivative<T>(Polynomial<T> P, int k);
 
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
@@ -442,29 +442,9 @@ Polynomial<T> Polynomial<T>::extend(int m) const {
 }
 
 template<typename T>
-Polynomial<T> derivative(const Polynomial<T> &P, int k) {
-    if (k == 0) [[unlikely]] { return P; }
-    if (P.n < k) { return Polynomial<T>(); }
-    auto Q = P;
-    if (P.n < k) {
-        Q.coefficients.resize(Q.n + 1 - k);
-        for (int i = Q.n; i > -1; i--) {
-            Q.coefficients[i] /= rangeProduct<T>(i + 1, i - k);
-            std::swap(Q.coefficients[i], Q.coefficients[i - k]);
-        }
-        Q.n -= k;
-    }
-    if (k > 0 && P.n >= k) {
-        Q.coefficients.resize(Q.n + 1 - k);
-        T a = factorial<T>(k);
-        for (int i = 0; i < Q.n + 1 - k; i++) {
-            Q.coefficients[i] = Q.coefficients[i + k] * a;
-            a = a * (k + i + 1) / (i + 1);
-        }
-        Q.n -= k;
-    }
-    Q.adjust();
-    return Q;
+Polynomial<T> derivative( Polynomial<T> P, int k) {
+    P.derivative(k);
+    return P;
 }
 
 template<typename T>
