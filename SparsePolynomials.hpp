@@ -599,7 +599,16 @@ heap_div(const SparsePolynomial<T1> &dividend, const SparsePolynomial<T2> &divis
     SparsePolynomial<decltype(T1() * T2())> quotient;
     SparsePolynomial<decltype(T1() * T2())> remainder = dividend;
     std::priority_queue<Monomial<decltype(T1() * T2())>> heap;
-    while (!heap.empty()) {}
+    for (const auto &mono: dividend) {
+        heap.push(mono);
+    }
+    while (!heap.empty() && heap.top().degree() >= divisor.degree()) {
+        auto LeadingTermDividend = heap.top();
+        Monomial<decltype(T1() * T2())> QuotientTerm{LeadingTermDividend.coeff() / divisor.dominant().coeff(),
+                                                     LeadingTermDividend.degree() - divisor.dominant().degree()};
+        quotient.add(QuotientTerm);
+
+    }
     return {quotient, remainder};
 }
 
