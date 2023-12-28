@@ -240,7 +240,7 @@ public:
 
     void derivative(int k = 1);
 
-    friend SparsePolynomial<T> derivative<T>(SparsePolynomial<T> P, int k);
+    friend SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k);
 
     friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
     euclid_div(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
