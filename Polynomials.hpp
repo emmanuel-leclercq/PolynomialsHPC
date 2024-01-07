@@ -6,6 +6,7 @@
 #include <random>
 #include <complex>
 #include <algorithm>
+#include <ranges>
 #include <iostream>
 #include "utils.hpp"
 
@@ -49,7 +50,7 @@ template<typename T>
 std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
 
 template<typename T>
-Polynomial<T> derivative( Polynomial<T> P, int k = 1);
+Polynomial<T> derivative(Polynomial<T> P, int k = 1);
 
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
@@ -80,8 +81,8 @@ private:
             return;
         }
 
-        size_t midA = (startA + endA) / 2;
-        size_t midB = (startB + endB) / 2;
+        size_t midA = std::midpoint(startA, endA);
+        size_t midB = std::midpoint(startB, endB);
 
         // Recursive computations
         multiplyRec(A, startA, midA, B, startB, midB, result, startResult);
@@ -136,14 +137,18 @@ private:
         size_t m = n / 3;  // Divide size by three
 
         // Split A and B into three parts each
-        size_t midA1 = startA + m, midA2 = startA + 2 * m;
-        size_t midB1 = startB + m, midB2 = startB + 2 * m;
+        size_t midA1 = startA + m;
+        size_t midA2 = startA + 2 * m;
+        size_t midB1 = startB + m;
+        size_t midB2 = startB + 2 * m;
 
         // Compute intermediate products using Cantor's algorithm
         cantorRec(A, startA, midA1, B, startB, midB1, result, startResult);
         cantorRec(A, midA2, endA, B, midB2, endB, result, startResult + 2 * m);
 
-        std::vector<T> tempA(m), tempB(m);
+        std::vector<T> tempA(m);
+        std::vector<T> tempB(m);
+
         for (size_t i = 0; i < m; ++i) {
             tempA[i] = A[startA + i] + A[midA1 + i] - A[midA2 + i];
             tempB[i] = B[startB + i] + B[midB1 + i] - B[midB2 + i];
@@ -220,7 +225,7 @@ public:
     std::vector<T> operator()(const std::vector<U> &) const;
 
     //O(n^2), will try sub quadratic algo with FFT, also need to switch to templated input vect type
-    std::vector<T> multipointEval(const std::vector<T> &points) const;
+    std::vector<T> RawMultipointEval(const std::vector<T> &points) const;
 
     void derivative(int k = 1);
 
@@ -298,24 +303,20 @@ template<typename T>
 Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
     if (points.size() == 0) { return Polynomial<T>(); }
     if (points.size() == 1) { return Polynomial<T>(points[0].second); }
-    else {
-        std::vector<T> ans(points.size(), 0);
-        for (int i = 0; i < points.size(); i++) {
-            double L = 1.0;
-            for (int j = 0; j < points.size(); j++) {
-                if (i != j) {
-                    L *= (points[i].first - points[j].first);
-                }
-            }
-            for (int j = 0; j < points.size(); j++) {
-                if (i != j) {
-                    double factor = points[i].second / (points[i].first - points[j].first);
-                    ans[j] += factor / L;
-                }
+    std::vector<T> ans(points.size(), 0);
+    for (int i = 0; i < points.size(); i++) {
+        double L = 1.0;
+        for (int j = 0; j < points.size(); j++) {
+            L *= (i != j) ? (points[i].first - points[j].first) : 1;
+        }
+        for (int j = 0; j < points.size(); j++) {
+            if (i != j) {
+                double factor = points[i].second / (points[i].first - points[j].first);
+                ans[j] += factor / L;
             }
         }
-        return Polynomial<T>(ans);
     }
+    return Polynomial<T>(ans);
 }
 
 template<typename T>
@@ -359,21 +360,21 @@ T Polynomial<T>::operator()(const U &x) const {
 template<typename T>
 template<typename U>
 std::vector<T> Polynomial<T>::operator()(const std::vector<U> &v) const {
-    return multipointEval(v);
+    return RawMultipointEval(v);
 }
 
 template<typename T>
-std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const {
+std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) const {
     int m = points.size();
     std::vector<T> ans(m);
-    std::transform(points.begin(), points.end(), ans.begin(), [this](const T &x) { return this->operator()(x); });
+    std::ranges::transform(points, ans.begin(), [this](const T &x) { return this->operator()(x); });
     return ans;
 
 }
 
 
 //template<typename T>
-//std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const {
+//std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) const {
 //    /*
 //     * Algorithm inspired by Modern Computer Algebra - Joachim von zur Gathen, Jürgen Gerhard  (2013)
 //     * this is much slower than using Horner n times unfortunately...
@@ -399,8 +400,8 @@ std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const
 //    Polynomial<T> remainderQ2 = (*this) % Q2;
 //
 //    // Merge results
-//    std::vector<T> results = Q1.multipointEval(pointsLeft);
-//    std::vector<T> rightResults = Q2.multipointEval(pointsRight);
+//    std::vector<T> results = Q1.RawMultipointEval(pointsLeft);
+//    std::vector<T> rightResults = Q2.RawMultipointEval(pointsRight);
 //    results.insert(results.end(), rightResults.begin(), rightResults.end());
 //    return results;
 //}
@@ -408,10 +409,10 @@ std::vector<T> Polynomial<T>::multipointEval(const std::vector<T> &points) const
 Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
     std::random_device rd;
     std::mt19937 G(rd());
-    std::uniform_int_distribution<int> unif(inf, sup);
+    std::uniform_int_distribution unif(inf, sup);
     auto gen = [&G, &unif]() { return unif(G); };
     std::vector<int> v(n + 1);
-    std::generate(v.begin(), v.end(), gen);
+    std::ranges::generate(v, gen);
     return Polynomial<int>(v);
 }
 
@@ -420,7 +421,7 @@ Polynomial<T> generateRandomPolynomial(int n, Distribution &distribution, Genera
     std::random_device rd;
     auto gen = [&generator, &distribution]() { return distribution(generator); };
     std::vector<T> v(n + 1);
-    std::generate(v.begin(), v.end(), gen);
+    std::ranges::generate(v, gen);
     return Polynomial<T>(v);
 }
 
@@ -442,7 +443,7 @@ Polynomial<T> Polynomial<T>::extend(int m) const {
 }
 
 template<typename T>
-Polynomial<T> derivative( Polynomial<T> P, int k) {
+Polynomial<T> derivative(Polynomial<T> P, int k) {
     P.derivative(k);
     return P;
 }
@@ -482,9 +483,9 @@ Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &p, const Polyn
 
     Polynomial<decltype(T1() * T2())> result(polynomial_ref_pair.second); // single copy of the largest
 
-    std::transform(
-            polynomial_ref_pair.first.coefficients.begin(), polynomial_ref_pair.first.coefficients.end(),
-            result.coefficients.begin(),
+    std::ranges::transform(
+            polynomial_ref_pair.first.coefficients,
+            result.coefficients,
             result.coefficients.begin(),
             std::plus<decltype(T1() * T2())>());
 
@@ -500,15 +501,14 @@ Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &p, const Polyn
     });
     Polynomial<decltype(T1() * T2())> result(polynomial_ref_pair.second);
     if (&polynomial_ref_pair.first == &p) {
-        std::transform(
-                polynomial_ref_pair.first.coefficients.begin(), polynomial_ref_pair.first.coefficients.end(),
-                result.coefficients.begin(),
+        std::ranges::transform(
+                polynomial_ref_pair.first.coefficients,
+                result.coefficients,
                 result.coefficients.begin(),
                 std::minus<decltype(T1() *
                                     T2())>());
     } else {
-        std::transform(result.coefficients.begin(),
-                       result.coefficients.end(), polynomial_ref_pair.first.coefficients.begin(),
+        std::ranges::transform(result.coefficients, polynomial_ref_pair.first.coefficients,
                        result.coefficients.begin(),
                        std::minus<decltype(T1() *
                                            T2())>());
@@ -536,7 +536,7 @@ Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &p, const Polyn
     /*
      * FFT multiplication is accurate for ints only, and become (much) faster for output degree>200
      */
-    if (std::is_integral<decltype(T1() * T2())>::value && m > 200) { return fftmultiply(p, q); }
+    if (std::is_integral_v<decltype(T1() * T2())> && m > 200) { return fftmultiply(p, q); }
     else {
         std::vector<decltype(T1() * T2())> coeffs(m + 1);
         for (int i = 0; i <= p.degree(); ++i) {
@@ -611,8 +611,8 @@ template<typename T>
 std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
     // +/- implementation ?
     char var;
-    if constexpr (std::is_same<T, std::complex<float>>::value || std::is_same<T, std::complex<double>>::value ||
-                  std::is_same<T, std::complex<long double>>::value) {
+    if constexpr (std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>> ||
+                  std::is_same_v<T, std::complex<long double>>) {
         var = 'z';
         for (int i = p.n; i > 1; --i) {
             if (!is_zero(p.coefficients[i])) {
@@ -662,11 +662,10 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b) {
     if (a.n < 0 || b.n < 0) {
-        Polynomial<decltype(T1() * T2())> zero;
-        return zero;
+        return Polynomial<decltype(T1() * T2())>();
     } else {
-        std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end()), fb(
-                b.coefficients.begin(), b.coefficients.end());
+        std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end());
+        std::vector<std::complex<double>> fb(b.coefficients.begin(), b.coefficients.end());
         int n = 1;
         while (n < a.coefficients.size() + b.coefficients.size()) { n <<= 1; }
         fa.resize(n);

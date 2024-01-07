@@ -19,20 +19,20 @@ int main() {
     cout << "Default polynomial degree : " << q.degree() << endl;
 
     vector<int> v1{6, 3, 0, 1, 5};
-    Polynomial<int> p1(v1);
+    Polynomial p1(v1);
 
     vector<int> v2{1, 0, 1};
-    Polynomial<int> p2(v2);
+    Polynomial p2(v2);
 
     vector<double> v3{6, 3, 0, 1, 5};
-    Polynomial<double> p3(v3);
+    Polynomial p3(v3);
 
     std::complex<double> a(2.0, 1.0);
     std::complex<double> b(0.0, 1.0);
     vector<std::complex<double>> vc{a, b};
-    Polynomial<std::complex<double>> pc(vc);
+    Polynomial pc(vc);
 
-    std::complex<int> one = 1;
+    std::complex one = 1;
     cout << "Is one one : " << is_one(one) << endl;
 
     cout << "is 2+i zero : " << is_zero(a) << endl;
@@ -46,7 +46,7 @@ int main() {
     Polynomial<double> withRoots({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, true);
     cout << "Building polynomial from roots 1,2,3,...,12: " << withRoots << endl << endl;
     std::vector<double> points{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-    auto ans{withRoots.multipointEval(points)};
+    auto ans{withRoots.RawMultipointEval(points)};
     cout << "checking correctness with multipoint evaluation: ";
     for (auto x: ans) { cout << x << " "; }
     cout << endl << endl;
@@ -99,7 +99,7 @@ int main() {
     std::random_device rd;
     std::mt19937 mt_generator(rd());
     std::default_random_engine def_generator(rd());
-    std::normal_distribution<double> double_distribution(0.0, 1.0);
+    std::normal_distribution double_distribution(0.0, 1.0);
 
     auto Q = generateRandomPolynomial<double>(30, double_distribution, def_generator);
 
