@@ -21,14 +21,16 @@
 template<typename T>
 class Monomial;
 
-template<typename T, typename Y>
-bool operator<(const Monomial<T> &u, const Monomial<Y> &v) { return u.n < v.n; }
+template<typename T1, typename T2>
+auto operator<=>(const Monomial<T1> &u, const Monomial<T2> &v) {
+    return u.degree() <=> v.degree();
+}
 
-template<typename T, typename Y>
-bool operator==(const Monomial<T> &u, const Monomial<Y> &v) { return u.n == v.n && u.coeff() == v.coeff(); }
+template<typename T1, typename T2>
+bool operator==(const Monomial<T1> &u, const Monomial<T2> &v) { return u.n == v.n && u.coeff() == v.coeff(); }
 
-template<typename T, typename Y>
-bool operator==(const Monomial<T> &u, const Y &t) { return u.coeff() == t; }
+template<typename T1, typename T2>
+bool operator==(const Monomial<T1> &u, const T2 &t) { return u.coeff() == t; }
 
 template<typename T1, typename T2>
 Monomial<decltype(T1() * T2())> operator*(const Monomial<T1> &lhs, const Monomial<T2> &rhs) {
@@ -100,11 +102,14 @@ public:
     /*
      * Ordering by degree
      */
-    friend bool operator< /* */ <>(const Monomial<T> &u, const Monomial<T> &v);
+    template<typename T1, typename T2>
+    friend auto operator<=>(const Monomial<T1> &u, const Monomial<T2> &v);
 
-    friend bool operator==<>(const Monomial<T> &u, const Monomial<T> &v);
+    template<typename T1, typename T2>
+    friend bool operator==(const Monomial<T1> &u, const Monomial<T2> &v);
 
-    friend bool operator==<>(const Monomial<T> &u, const T &t);
+    template<typename T1, typename T2>
+    friend bool operator==(const Monomial<T1> &u, const T2 &t);
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Monomial<T> &);
@@ -158,7 +163,7 @@ public:
      * considering certain data types make more sense for a sparse implementation,
      * and to reduce the need for preprocessing existing variables
      */
-    SparsePolynomial() : monomials(), n(-1), is_sorted(true) {}
+    SparsePolynomial() : is_sorted(true) {}
 
     /*
      * Constructors assuming input is not 'sparse', which spears us
@@ -180,21 +185,21 @@ public:
 
     explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients);
 
-    explicit SparsePolynomial(const std::map<int, T> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::map<int, T> &coefficients);
 
-    explicit SparsePolynomial(const std::map<int, T> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::map<int, T> &&coefficients);
 
-    explicit SparsePolynomial(const std::unordered_map<int, T> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::unordered_map<int, T> &coefficients);
 
-    explicit SparsePolynomial(const std::unordered_map<int, T> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::unordered_map<int, T> &&coefficients);
 
-    explicit SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients);
 
-    explicit SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients);
 
-    explicit SparsePolynomial(const std::list<std::pair<int, T>> &coefficients, bool sorted);
+    explicit SparsePolynomial(const std::list<std::pair<int, T>> &coefficients);
 
-    explicit SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients, bool sorted);
+    explicit SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients);
 
 
     /*
@@ -205,15 +210,6 @@ public:
     //  Default destructor will be used, standard data types
     ~SparsePolynomial() = default;
 
-//    [[nodiscard]] int degree() const {
-//        if (is_sorted) { return n; }
-//        else {
-//            return std::max_element(monomials.begin(), monomials.end(), [](const Monomial<T> &a,
-//                                                                           const Monomial<T> &b) {
-//                return a.degree() < b.degree();
-//            })->degree();
-//        }
-//    }
     [[nodiscard]] int degree() const { return n; };
 
     [[nodiscard]] Monomial<T> dominant() const { return *monomials.begin(); }
@@ -222,7 +218,6 @@ public:
 
     void reorder() {
         monomials.sort([](Monomial<T> &P, Monomial<T> &Q) { return Q < P; });
-        is_sorted = true;
     }
 
     void adjust() {
@@ -233,7 +228,7 @@ public:
 
     auto end() const { return monomials.end(); }
 
-    void add(const Monomial<T> &m) { monomials.push_back(m); }
+    void add(const Monomial<T> &m) { if (m != 0) monomials.push_back(m); }
 
     template<typename U>
     T operator()(const U &) const;
@@ -301,152 +296,163 @@ template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients) {
     int index = coefficients.size();
     n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](const T &p) { return Monomial<T>(p, index--); });
-    is_sorted = true;
+    std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
+        index--;
+        if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
+    });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients) {
     int index = coefficients.size();
     n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](T &p) { return Monomial<T>(std::move(p), index--); });
-    is_sorted = true;
+    std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
+        index--;
+        if (p != 0) { monomials.push_back(Monomial<T>(std::move(p), index)); }
+    });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients) {
     int index = coefficients.size();
     n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](const T &p) { return Monomial<T>(p, index--); });
+    std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
+        index--;
+        if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
+    });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients) {
     int index = coefficients.size();
     n = index;
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [&index](T &p) { return Monomial<T>(std::move(p), index--); });
-    is_sorted = true;
+    std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
+        index--;
+        if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
+    });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](const std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(p.second, p.first);
-                   });
-    this->is_sorted = true;
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](const std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(p.second, p.first);
+                           });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(std::move(p.second), p.first);
-                   });
-    this->is_sorted = true;
-    delete coefficients;
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(std::move(p.second), p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](const std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(p.second, p.first);
-                   });
-    is_sorted = sorted;
+SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &coefficients) {
+    std::ranges::transform(coefficients, std::front_inserter(this->monomials),
+                           [this](const std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(p.second, p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &&coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(std::move(p.second), p.first);
-                   });
-
-    delete coefficients;
+SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &&coefficients) {
+    std::ranges::transform(coefficients.begin(), coefficients.end(), std::front_inserter(this->monomials),
+                           [this](std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(std::move(p.second), p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &&coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(std::move(p.second), p.first);
-                   });
-    delete coefficients;
+SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &&coefficients) {
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(std::move(p.second), p.first);
+                           });
+    this->reorder();
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](const std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(p.second, p.first);
-                   });
+SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &coefficients) {
+    /*
+     * We could the unordered_map elements to a heap after transformation and then feed
+     * the monomials list so that it comes out sorted, instead of sorting separately.
+     * Might be worth testing which is faster.
+     */
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials), [this](const std::pair<int, T> p) {
+        n = std::max(n, p.first);
+        return Monomial<T>(p.second, p.first);
+    });
+    this->reorder();
 }
 
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](const std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(p.second, p.first);
-                   });
+SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients) {
+    /*
+     * The input vector is assumed ordered by degree
+     */
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](const std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(p.second, p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(std::move(p.second), p.first);
-                   });
-    delete coefficients;
+SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients) {
+    /*
+     * The input vector is assumed ordered by degree
+     */
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(std::move(p.second), p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](const std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(p.second, p.first);
-                   });
+SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &coefficients) {
+    /*
+     * The input list is assumed ordered by degree
+     */
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials),
+                           [this](const std::pair<int, T> &p) {
+                               n = std::max(n, p.first);
+                               return Monomial<T>(p.second, p.first);
+                           });
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients, bool sorted) {
-    std::transform(coefficients.begin(), coefficients.end(), std::back_inserter(this->monomials),
-                   [this](std::pair<int, T> &p) {
-                       n = std::max(n, p.first);
-                       return Monomial<T>(std::move(p.second), p.first);
-                   });
-    delete coefficients;
+SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients) {
+    /*
+     * The input list is assumed ordered by degree
+     */
+    std::ranges::transform(coefficients, std::back_inserter(this->monomials), [this](std::pair<int, T> &p) {
+        n = std::max(n, p.first);
+        return Monomial<T>(std::move(p.second), p.first);
+    });
 }
 
 template<typename T>
 SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsity) {
-    if (check_sparsity) {
-        if (!P.is_sparse()) {
-            throw std::invalid_argument(
-                    "The polynomial is not sparse enough, to force conversion set second parameter to false");
-        }
+    if (check_sparsity && !P.is_sparse()) {
+        throw std::invalid_argument(
+                "The polynomial is not sparse enough, to force conversion set second parameter to false");
     }
+
     n = P.degree();
     for (int index = n; index > -1; index--) {
         if (!is_zero(P[index])) {
             monomials.emplace_back(P[index], index);
         }
     }
-    is_sorted = true;
 }
 
 template<typename T>
@@ -504,57 +510,44 @@ std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
 
 template<typename T1, typename T2>
 SparsePolynomial<decltype(T1() * T2())> operator+(const SparsePolynomial<T1> &lhs, const SparsePolynomial<T2> &rhs) {
-    if (rhs.is_sorted && lhs.is_sorted) {
-        SparsePolynomial<decltype(T1() * T2())> result;
-        auto it1 = lhs.begin();
-        auto it2 = rhs.begin();
-        while (it1 != lhs.end() && it2 != rhs.end()) {
-            if (it1->degree() < it2->degree()) {
-                result.monomials.push_back(*it1);
-                ++it1;
-            } else if (it1->degree() > it2->degree()) {
-                result.monomials.push_back(*it2);
-                ++it2;
-            } else {
-                decltype(T1() * T2()) new_coefficient = it1->coeff() + it2->coeff();
-
-                if (new_coefficient != decltype(T1() * T2())(0)) {
-                    result.monomials.push_back(Monomial<decltype(T1() * T2())>(it1->degree(), new_coefficient));
-                }
-
-                ++it1;
-                ++it2;
-            }
-        }
-
-        // Handle the remaining monomials in either polynomial
-        while (it1 != lhs.end()) {
+    SparsePolynomial<decltype(T1() * T2())> result;
+    auto it1 = lhs.begin();
+    auto it2 = rhs.begin();
+    while (it1 != lhs.end() && it2 != rhs.end()) {
+        if (it1->degree() > it2->degree()) {
             result.monomials.push_back(*it1);
             ++it1;
-        }
-        while (it2 != rhs.end()) {
+        } else if (it1->degree() < it2->degree()) {
             result.monomials.push_back(*it2);
             ++it2;
+        } else {
+            if (decltype(T1() * T2()) new_coefficient = it1->coeff() + it2->coeff();
+                    new_coefficient != decltype(T1() * T2())(0)) {
+                result.monomials.push_back(Monomial<decltype(T1() * T2())>(it1->degree(), new_coefficient));
+            }
+
+            ++it1;
+            ++it2;
         }
-        return result;
-    } else {
-        std::map<int, decltype(T1() * T2()), std::greater<int>> result;
-        for (auto it = lhs.begin(); it != lhs.end(); it++) {
-            result[it->degree()] += it->coeff();
-        }
-        for (auto it = rhs.begin(); it != rhs.end(); it++) {
-            result[it->degree()] += it->coeff();
-        }
-        SparsePolynomial<decltype(T1() * T2())> ans(result);
-        return ans;
     }
+
+    // Handle the remaining monomials in either polynomial
+    while (it1 != lhs.end()) {
+        result.monomials.push_back(*it1);
+        ++it1;
+    }
+    while (it2 != rhs.end()) {
+        result.monomials.push_back(*it2);
+        ++it2;
+    }
+    return result;
 }
 
 template<typename T1, typename T2>
 SparsePolynomial<decltype(T1() * T2())> operator-(const SparsePolynomial<T1> &lhs, const SparsePolynomial<T2> &rhs) {
     SparsePolynomial<decltype(T1() * T2())> result(rhs);
-    std::transform(result.monomials.begin(), result.monomials.end(), result.monomials.begin(),
-                   [](const Monomial<decltype(T1() * T2())> &m) { return negate(m); });
+    std::ranges::transform(result.monomials, begin(result.monomials),
+                           [](const Monomial<decltype(T1() * T2())> &m) { return negate(m); });
     return lhs + result;
 }
 
@@ -634,13 +627,19 @@ SparsePolynomial<decltype(T1() * T2())> operator/(const SparsePolynomial<T1> &P,
 }
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {}
+SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+
+}
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator+=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {}
+SparsePolynomial<decltype(T1() * T2())> operator+=(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+    return A + B;
+}
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator-=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {}
+SparsePolynomial<decltype(T1() * T2())> operator-=(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+    return A - B;
+}
 
 template<typename T1, typename T2>
 SparsePolynomial<decltype(T1() * T2())> operator*=(SparsePolynomial<T1> &A, SparsePolynomial<T2> &B) {
