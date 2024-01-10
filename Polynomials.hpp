@@ -13,38 +13,44 @@
 template<typename T>
 class Polynomial;
 
-template<typename T, typename T1, typename T2>
+template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T, typename T1, typename T2>
+template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T, typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T> &);
-
-template<typename T, typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
-
-template<typename T, typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &, const Polynomial<T2> &);
-
-template<typename T, typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T> &, const Polynomial<T> &);
-
-template<typename T, typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &, const Polynomial<T2> &);
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
+Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
 
-template<typename T>
-Polynomial<T> operator/=(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
 
-template<typename T>
-Polynomial<T> operator%=(const Polynomial<T> &, const Polynomial<T> &);
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator+=(Polynomial<T1> &, const Polynomial<T2> &);
+
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator-=(Polynomial<T1> &, const Polynomial<T2> &);
+
+template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &, const Polynomial<T2> &);
+
+//template<typename T1, typename T2>
+//bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
+//
+//template<typename T>
+//Polynomial<T> operator/=(const Polynomial<T> &, const Polynomial<T> &);
+//
+//template<typename T>
+//Polynomial<T> operator/=(const Polynomial<T> &, const T);
+//
+//template<typename T>
+//Polynomial<T> operator%=(const Polynomial<T> &, const Polynomial<T> &);
 
 template<typename T>
 std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
@@ -201,6 +207,9 @@ public:
 //  Copy/move assignments
     Polynomial<T> &operator=(const Polynomial<T> &) = default;
 
+
+
+
 //    Polynomial<T> &operator=(Polynomial<T> &&) = default;
 
 //  Destructor
@@ -227,6 +236,9 @@ public:
     //O(n^2), will try sub quadratic algo with FFT, also need to switch to templated input vect type
     std::vector<T> RawMultipointEval(const std::vector<T> &points) const;
 
+    std::vector<T> TreeMultipointEval(const std::vector<T> &points) const;
+
+
     void derivative(int k = 1);
 
     [[nodiscard]] T &dominant() { return coefficients[n]; }
@@ -250,22 +262,25 @@ public:
     friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
+    friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
+
+    template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &, const Polynomial<T2> &);
+    friend Polynomial<decltype(T1() * T2())> operator+=(Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T1> &, const Polynomial<T2> &);
+    friend Polynomial<decltype(T1() * T2())> operator-=(Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &, const Polynomial<T2> &);
+    friend Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator/=(const Polynomial<T1> &, const Polynomial<T2> &);
+    friend Polynomial<decltype(T1() * T2())> operator/=(Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &, const Polynomial<T2> &);
+    friend Polynomial<decltype(T1() * T2())> operator%=(Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
     friend bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
@@ -303,20 +318,23 @@ template<typename T>
 Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
     if (points.size() == 0) { return Polynomial<T>(); }
     if (points.size() == 1) { return Polynomial<T>(points[0].second); }
-    std::vector<T> ans(points.size(), 0);
-    for (int i = 0; i < points.size(); i++) {
-        double L = 1.0;
-        for (int j = 0; j < points.size(); j++) {
-            L *= (i != j) ? (points[i].first - points[j].first) : 1;
+    auto m = points.size();
+    Polynomial<T> ans;
+
+    for (int i = 0; i < m; ++i) {
+        Polynomial<T> temp({points[i].second});
+        for (int j = 0; j < m; ++j) {
+            if (i == j) { continue; }
+            temp *= Polynomial<T>(
+                    {-points[j].second / (points[i].first - points[j].first), 1 / (points[i].first - points[j].first)});
         }
-        for (int j = 0; j < points.size(); j++) {
-            if (i != j) {
-                double factor = points[i].second / (points[i].first - points[j].first);
-                ans[j] += factor / L;
-            }
-        }
+//        std::cout << "temp" << i << " " << temp << " ";
+        ans += temp;
+//        std::cout << "ans" << i << " " << temp << " ";
+
     }
-    return Polynomial<T>(ans);
+//    std::cout << "ans= ";
+    return ans;
 }
 
 template<typename T>
@@ -372,6 +390,37 @@ std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) co
 
 }
 
+template <typename T>
+void buildTree(std::vector<std::vector<T>>& tree, const std::vector<T>& points, size_t idx = 0) {
+    if (idx >= tree.size() / 2) {
+        // Leaf nodes
+        size_t pointIdx = idx - tree.size() / 2;
+        if (pointIdx < points.size()) {
+            tree[idx].push_back(points[pointIdx]);
+        }
+        return;
+    }
+    // Internal nodes
+    buildTree(tree, points, 2 * idx + 1);
+    buildTree(tree, points, 2 * idx + 2);
+    tree[idx].insert(tree[idx].end(), tree[2 * idx + 1].begin(), tree[2 * idx + 1].end());
+    tree[idx].insert(tree[idx].end(), tree[2 * idx + 2].begin(), tree[2 * idx + 2].end());
+}
+
+template<typename T>
+std::vector<T> Polynomial<T>::TreeMultipointEval(const std::vector<T> &points) const {
+    if (points.empty()) { return {}; }
+    if (points.size() == 1) { return {this->operator()(points[0])}; }
+    auto m = points.size();
+    std::vector<T> ans(m);
+    auto mid = std::midpoint(0, m);
+    auto left = points(points.begin(), points.begin() + mid);
+    auto right = points(points.begin() + mid, points.end());
+
+
+    return ans;
+
+}
 
 //template<typename T>
 //std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) const {
@@ -509,9 +558,9 @@ Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &p, const Polyn
                                     T2())>());
     } else {
         std::ranges::transform(result.coefficients, polynomial_ref_pair.first.coefficients,
-                       result.coefficients.begin(),
-                       std::minus<decltype(T1() *
-                                           T2())>());
+                               result.coefficients.begin(),
+                               std::minus<decltype(T1() *
+                                                   T2())>());
     }
     result.adjust();
     result.dominant() = polynomial_ref_pair.second.dominant();
@@ -571,33 +620,45 @@ Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &p, const Polyn
 }
 
 template<typename T1, typename T2>
+Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &p, const T2 q) {
+    std::vector<decltype(T1() * T2())> ans(p.coefficients.size());
+    std::ranges::transform(p.coefficients, ans.begin(), [q](const T1 x) { return x / q; });
+    return Polynomial(ans);
+}
+
+template<typename T1, typename T2>
 Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &p, const Polynomial<T2> &q) {
     return euclid_div(p, q).second;
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator+=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
-    return lhs + rhs;
+Polynomial<decltype(T1() * T2())> operator+=(Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
+    lhs = lhs + rhs;
+    return lhs;
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator-=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
-    return lhs - rhs;
+Polynomial<decltype(T1() * T2())> operator-=(Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
+    lhs = lhs - rhs;
+    return lhs;
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator*=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
-    return lhs * rhs;
+Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
+    lhs = lhs * rhs;
+    return lhs;
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator/=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
-    return lhs / rhs;
+Polynomial<decltype(T1() * T2())> operator/=(Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
+    lhs = lhs / rhs;
+    return lhs;
 }
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator%=(const Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
-    return lhs % rhs;
+Polynomial<decltype(T1() * T2())> operator%=(Polynomial<T1> &lhs, const Polynomial<T2> &rhs) {
+    lhs = lhs % rhs;
+    return lhs;
 }
 
 template<typename T1, typename T2>

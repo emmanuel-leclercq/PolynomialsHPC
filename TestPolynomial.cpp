@@ -18,19 +18,15 @@ int main() {
     Polynomial<double> q;
     cout << "Default polynomial degree : " << q.degree() << endl;
 
-    vector<int> v1{6, 3, 0, 1, 5};
-    Polynomial p1(v1);
+    Polynomial<int> p1({6, 3, 0, 1, 5});
 
-    vector<int> v2{1, 0, 1};
-    Polynomial p2(v2);
+    Polynomial<int> p2({1, 0, 1});
 
-    vector<double> v3{6, 3, 0, 1, 5};
-    Polynomial p3(v3);
+    Polynomial<int> p3({6, 3, 0, 1, 5});
 
     std::complex<double> a(2.0, 1.0);
     std::complex<double> b(0.0, 1.0);
-    vector<std::complex<double>> vc{a, b};
-    Polynomial pc(vc);
+    Polynomial<std::complex<double>> pc({a, b});
 
     std::complex one = 1;
     cout << "Is one one : " << is_one(one) << endl;
@@ -62,13 +58,17 @@ int main() {
     cout << "p1-p2 : " << diff << endl;
     cout << "p2-p1 : " << diff2 << endl;
     cout << "p1*p2 : " << prod << endl;
+    p1 += p2;
+    cout << "p1+=p2 : " << p1 << endl;
     cout << endl;
 
     // Division and remainder
     Polynomial<int> div = p1 / p2;
     Polynomial<int> remainder = p1 % p2;
-    cout << "Quotient : " << div << endl;
-    cout << "Remainder : " << remainder << endl;
+    cout << "Quotient p1 / p2: " << div << endl;
+    cout << "Remainder p1 % p2: " << remainder << endl;
+    cout << "p1 / 3: " << p1 / 3 << endl;
+    cout << "p1 / 3.0: " << p1 / 3.0 << endl;
     cout << endl;
     // function evaluation
     cout << "p1(2) : " << p1(2) << endl;
@@ -82,16 +82,13 @@ int main() {
     p3.derivative(-1);
     cout << "Test p1.derivative(-1) = " << p3 << endl;
     cout << "p1.degree() = " << p3.degree() << endl;
-    cout << "test derivative(p1) = " << derivative<double>(p3) << endl;
-    cout << "test derivative(p1,-1) = " << derivative<double>(p3, -1) << endl;
+    cout << "test derivative(p1) = " << derivative(p3) << endl;
+    cout << "test derivative(p1,-1) = " << derivative(p3, -1) << endl;
     cout << endl;
-    cout << "Test interpolation (0,0), (1,1) (3,9): ";
-    vector<std::pair<double, double>> data = {{0, 0},
-                                              {2, 4},
-                                              {4, 16}};
-    auto interpolation = interpolate<double>({{0, 0},
-                                              {2, 4},
-                                              {4, 16}});
+    cout << "Test interpolation (0,0), (2,4) (4,16): ";
+    auto interpolation = interpolate<double>({{1.0, 1.0},
+                                              {2.0, 4.0},
+                                              {4.0, 16.0}});
     cout << interpolation << endl;
     // Random polynomials generation
     auto P = generateRandomIntPolynomial(100, 0, 1);
