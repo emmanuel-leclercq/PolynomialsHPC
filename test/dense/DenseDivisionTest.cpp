@@ -5,6 +5,9 @@
 #include <iostream>
 #include "Polynomials.hpp"
 
-int main(){
-    return 0;
+#include "gtest/gtest.h"
+namespace {
+    TEST(DivisionTest, Zero) {}
+    TEST(DivisionTest, Remainder) {}
+    TEST(DivisionTest,Quotient){}
 }

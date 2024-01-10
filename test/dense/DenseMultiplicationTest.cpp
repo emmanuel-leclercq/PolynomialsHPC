@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Polynomials.hpp"
 
-int main(){
-    return 0;
+#include "gtest/gtest.h"
+namespace {
+    TEST(MultiplicationTest, Zero) {}
+    TEST(MultiplicationTest, Normal) {}
 }
