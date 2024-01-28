@@ -391,20 +391,43 @@ std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) co
 }
 
 template <typename T>
-void buildTree(std::vector<std::vector<T>>& tree, const std::vector<T>& points, size_t idx = 0) {
+void buildTree(std::vector<Polynomial<T>>& tree, const std::vector<T>& points, size_t k, size_t idx = 0) {
     if (idx >= tree.size() / 2) {
-        // Leaf nodes
         size_t pointIdx = idx - tree.size() / 2;
         if (pointIdx < points.size()) {
-            tree[idx].push_back(points[pointIdx]);
+            tree[idx] = Polynomial<T>{-points[pointIdx], 1};  // M_0,j = X - u_j
         }
         return;
     }
-    // Internal nodes
-    buildTree(tree, points, 2 * idx + 1);
-    buildTree(tree, points, 2 * idx + 2);
-    tree[idx].insert(tree[idx].end(), tree[2 * idx + 1].begin(), tree[2 * idx + 1].end());
-    tree[idx].insert(tree[idx].end(), tree[2 * idx + 2].begin(), tree[2 * idx + 2].end());
+
+    buildTree(tree, points, k, 2 * idx + 1);
+    buildTree(tree, points, k, 2 * idx + 2);
+    if (idx > 0) {
+        tree[idx] = tree[2 * idx + 1] * tree[2 * idx + 2]; // M_i,j = M_i-1,2j * M_i-1,2j+1
+    }
+}
+
+template <typename T>
+std::vector<Polynomial<T>> evaluate(const Polynomial<T>& f, const std::vector<Polynomial<T>>& tree, size_t k, size_t idx = 0) {
+    std::vector<Polynomial<T>> result;
+
+    if (idx >= tree.size() / 2) {
+        if (idx < tree.size()) {
+            result.push_back(f); // Base case
+        }
+        return result;
+    }
+
+    Polynomial<T> r0 = f % tree[2 * idx + 1]; // f rem M_k-1,0
+    Polynomial<T> r1 = f % tree[2 * idx + 2]; // f rem M_k-1,1
+
+    auto res0 = evaluate(r0, tree, k, 2 * idx + 1);
+    auto res1 = evaluate(r1, tree, k, 2 * idx + 2);
+
+    result.insert(result.end(), res0.begin(), res0.end());
+    result.insert(result.end(), res1.begin(), res1.end());
+
+    return result;
 }
 
 template<typename T>
@@ -412,10 +435,10 @@ std::vector<T> Polynomial<T>::TreeMultipointEval(const std::vector<T> &points) c
     if (points.empty()) { return {}; }
     if (points.size() == 1) { return {this->operator()(points[0])}; }
     auto m = points.size();
-    std::vector<T> ans(m);
-    auto mid = std::midpoint(0, m);
-    auto left = points(points.begin(), points.begin() + mid);
-    auto right = points(points.begin() + mid, points.end());
+    size_t TreeSize=(1<<(m+1))-1;
+    std::vector<Polynomial<T>> tree(TreeSize);
+    buildTree(tree,points,m);
+    std::vector<T> ans;
 
 
     return ans;

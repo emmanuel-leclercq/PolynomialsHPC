@@ -7,11 +7,12 @@
 #include "gtest/gtest.h"
 namespace {
     TEST(ConstructorTest, Trivial) {
-    Polynomial<int> p1{{6, 3, 0, 1, 5}};
-    Polynomial<int> p2{{1, 0, 1}};
+    Polynomial<int> p1{{0, 0, 0, 0, 5}};
+    Polynomial<int> p2(5, 4);
+    Polynomial<double> p3{{1.5, 2.5}, true};
+    Polynomial<double> p4{{1, 4.0, 3.75}};
 
-    Polynomial<int> p3{{7, 3, 1, 1, 5}};
-
-    EXPECT_EQ(p1 + p2, p3);
+    EXPECT_EQ(p1, p2);
+    EXPECT_EQ(p3, p4);
 }
 }

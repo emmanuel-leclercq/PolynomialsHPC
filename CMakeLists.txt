@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(PolynomialsHPC)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20 REQUIRED)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v")
 
 #include(FetchContent)
 #FetchContent_Declare(
@@ -17,7 +19,9 @@ include_directories(${CMAKE_SOURCE_DIR})
 # add_library(${PROJECT_NAME} SHARED Polynomials.cpp)
 
 add_executable(Dense TestPolynomial.cpp)
+
 #add_executable(Sparse TestSparsePolynomial.cpp)
+
 #add_executable(bench multiplicationBenchmark.cpp)
 
 #enable_testing()
