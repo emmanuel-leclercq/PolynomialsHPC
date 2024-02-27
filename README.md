@@ -18,12 +18,11 @@ Addition between non-ordered sparse polynomials results in a sorted sparse polyn
 2. Subtraction: similar method to addition, but not using addition for speed
 3. Multiplication: implementation in O(n*m) for now, will try FFT for O(nlog(n))
 4. Division: euclid algorithm
-5. Evaluation: Horner's method
-6. Factorization (TODO)
-7. Interpolation: takes a vector<std::pair<T x,T y>> as input and returns a dense polynomial<T>
-8. nth derivatives: includes antiderivative (n<0), both derivative and antiderivative are O(n), we use a swap trick for
+5. Evaluation: Horner's method O(n)
+6. Interpolation: takes a vector<std::pair<T x,T y>> as input and returns a dense polynomial<T>
+7. nth derivatives: includes antiderivative (n<0), both derivative and antiderivative are O(n), we use a swap trick for
    the latter. Two implementations -> P.derivative() and derivative(P) for convenience (the latter doesn't modify P)
-9. Root finder (TODO)
+8. Root finder (TODO)
 
 ### Sparse Polynomial class
 
@@ -40,7 +39,7 @@ such as factorization (except for specific cases).
 2. Subtraction
 3. Multiplication (Johnson, Monagan, Pearce heap algorithm)
 4. Division (TODO)
-5. Evaluation (TODO)
+5. Evaluation
 6. nth derivatives
 7. Root finder (TODO)
 
