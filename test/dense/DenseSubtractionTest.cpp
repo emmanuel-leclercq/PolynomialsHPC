@@ -6,5 +6,11 @@
 
 #include "gtest/gtest.h"
 namespace {
-    TEST(SubtractionTest, Trivial) {}
+    TEST(SubtractionTest, Trivial) {
+        Polynomial<int> p1{{6, 3, 0, 1, 5}};
+        Polynomial<int> p2{{1, 0, 1}};
+        Polynomial<int> p3{{5, 3, -1, 1, 5}};
+
+        EXPECT_EQ(p1 - p2, p3);
+    }
 }
