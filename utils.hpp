@@ -7,39 +7,39 @@
 
 
 template<typename T>
-bool is_zero(T a) {
+inline bool is_zero(T a) {
     return (static_cast<int>(a) == 0);
 }
 
 template<typename T>
-bool is_one(T a) {
+inline bool is_one(T a) {
     return (a == 1);
 }
 
 //specialization for doubles: very small coefficients is basically zero
 template<>
-bool is_zero(double a) {
+inline bool is_zero(double a) {
     return (std::abs(a) < 1.e-5);
 }
 
 template<>
-bool is_one<double>(double a) {
+inline bool is_one<double>(double a) {
     return (std::abs(a - 1.) < 1.e-5);
 }
 
 // overload for complex numbers
 template<typename T>
-bool is_one(std::complex<T> c) {
+inline bool is_one(std::complex<T> c) {
     return is_one<T>(c.real()) && is_zero<T>(c.imag());
 }
 
 template<typename T>
-bool is_zero(std::complex<T> c) {
+inline bool is_zero(std::complex<T> c) {
     return is_zero<T>(c.real()) && is_zero<T>(c.imag());
 }
 
 template<typename T>
-T factorial(int n) {
+inline T factorial(int n) {
     T result = 1;
     for (int i = 1; i <= n; i++) {
         result *= i;
@@ -48,7 +48,7 @@ T factorial(int n) {
 }
 
 template<typename T>
-T rangeProduct(int n, int k) {
+inline T rangeProduct(int n, int k) {
     auto x = std::minmax(n, k);
 
     T result = 1;
@@ -59,16 +59,16 @@ T rangeProduct(int n, int k) {
 }
 
 template<typename T>
-bool should_add_plus(const T &x) {
+inline bool should_add_plus(const T &x) {
     return x >= 0;
 }
 
 template<typename T>
-bool should_add_plus(const std::complex<T> &z) {
+inline bool should_add_plus(const std::complex<T> &z) {
     return true;
 }
 
-int reverse(int num, int lg_n) {
+inline int reverse(int num, int lg_n) {
     int res = 0;
     for (int i = 0; i < lg_n; i++) {
         if (num & (1 << i))
@@ -77,7 +77,7 @@ int reverse(int num, int lg_n) {
     return res;
 }
 
-void fft(std::vector<std::complex<double>> &a, bool invert) {
+inline void fft(std::vector<std::complex<double>> &a, bool invert) {
     int n = a.size();
     int lg_n = 0;
     while ((1 << lg_n) < n)
@@ -113,7 +113,7 @@ constexpr bool IsPowerOf2(const size_t value) {
 }
 
 template<typename T>
-void coutVect(std::ostream &os, const std::vector<T> &v) {
+inline void coutVect(std::ostream &os, const std::vector<T> &v) {
     for (auto x: v) { os << x << " "; }
 }
 
@@ -121,13 +121,13 @@ class Timer {
     std::chrono::time_point<std::chrono::steady_clock> timePoint;
     size_t value;
 public:
-    void start() { timePoint = std::chrono::steady_clock::now(); }
+    inline void start() { timePoint = std::chrono::steady_clock::now(); }
 
-    void finish() {
+    inline void finish() {
         auto curr = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(curr - timePoint);
         value = elapsed.count();
     }
 
-    size_t operator()() const { return value; }
+    inline size_t operator()() const { return value; }
 };

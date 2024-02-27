@@ -14,31 +14,31 @@ template<typename T>
 class Polynomial;
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator+(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator-(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator*(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
+inline Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator+=(Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator+=(Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator-=(Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator-=(Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &, const Polynomial<T2> &);
+inline Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &, const Polynomial<T2> &);
 
 //template<typename T1, typename T2>
 //bool operator==(const Polynomial<T1> &, const Polynomial<T2> &);
@@ -53,13 +53,13 @@ Polynomial<decltype(T1() * T2())> operator*=(Polynomial<T1> &, const Polynomial<
 //Polynomial<T> operator%=(const Polynomial<T> &, const Polynomial<T> &);
 
 template<typename T>
-std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
+inline std::ostream &operator<<(std::ostream &, const Polynomial<T> &);
 
 template<typename T>
-Polynomial<T> derivative(Polynomial<T> P, int k = 1);
+inline Polynomial<T> derivative(Polynomial<T> P, int k = 1);
 
 template<typename T1, typename T2>
-Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
+inline Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
 
 template<typename T>
 class Polynomial {
@@ -222,9 +222,9 @@ public:
     auto end() const { return coefficients.end(); }
 
 //  Basic accessors/mutators
-    [[nodiscard]] int degree() const { return n; }
+    [[nodiscard]]  int degree() const { return n; }
 
-    [[nodiscard]] T dominant() const { return coefficients[n]; }
+    [[nodiscard]]  T dominant() const { return coefficients[n]; }
 
 //  return image of U by P
     template<typename U>
@@ -233,7 +233,7 @@ public:
     template<typename U>
     std::vector<T> operator()(const std::vector<U> &) const;
 
-    //O(n^2), will try sub quadratic algo with FFT, also need to switch to templated input vect type
+
     std::vector<T> RawMultipointEval(const std::vector<T> &points) const;
 
     std::vector<T> TreeMultipointEval(const std::vector<T> &points) const;
@@ -241,9 +241,9 @@ public:
 
     void derivative(int k = 1);
 
-    [[nodiscard]] T &dominant() { return coefficients[n]; }
+    [[nodiscard]] inline T &dominant() { return coefficients[n]; }
 
-    [[nodiscard]] bool is_sparse() const;
+    [[nodiscard]] inline bool is_sparse() const;
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
@@ -339,12 +339,15 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
 
 template<typename T>
 Polynomial<T>::Polynomial(const std::vector<T> &roots, bool fromRoots) {
+    /*
+     * creating a polynomial from roots if bool parameter set to True
+     */
     if (fromRoots) {
         *this = Polynomial<T>({1});
         for (const auto &root: roots) {
             *this = *this * Polynomial<T>({-root, 1});
         }
-    } else { *this = Polynomial<T>(); }
+    } else { *this = Polynomial<T>(roots); }
     n = coefficients.size() - 1;
 }
 
@@ -362,8 +365,9 @@ bool Polynomial<T>::is_sparse() const {
 template<typename T>
 template<typename U>
 T Polynomial<T>::operator()(const U &x) const {
+
     /*
-     * Using Horner's method for single point evaluation
+     * Using Horner's method for single point evaluation O(n)
      * Possibility to add different methods will be added for sparse cases
      */
 
@@ -378,11 +382,18 @@ T Polynomial<T>::operator()(const U &x) const {
 template<typename T>
 template<typename U>
 std::vector<T> Polynomial<T>::operator()(const std::vector<U> &v) const {
+    //O(n^2)
+    // will try sub quadratic algo with FFT, also need to switch to templated input vect type
     return RawMultipointEval(v);
 }
 
 template<typename T>
 std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) const {
+
+    /*
+     * O(n^2) implementation, Horner's method repeated for each point
+     */
+
     int m = points.size();
     std::vector<T> ans(m);
     std::ranges::transform(points, ans.begin(), [this](const T &x) { return this->operator()(x); });
@@ -390,8 +401,13 @@ std::vector<T> Polynomial<T>::RawMultipointEval(const std::vector<T> &points) co
 
 }
 
-template <typename T>
-void buildTree(std::vector<Polynomial<T>>& tree, const std::vector<T>& points, size_t k, size_t idx = 0) {
+template<typename T>
+void buildTree(std::vector<Polynomial<T>> &tree, const std::vector<T> &points, size_t k, size_t idx = 0) {
+
+    /*
+     * Helper function generating tree structure for fast multipoint evaluation
+     */
+
     if (idx >= tree.size() / 2) {
         size_t pointIdx = idx - tree.size() / 2;
         if (pointIdx < points.size()) {
@@ -407,8 +423,14 @@ void buildTree(std::vector<Polynomial<T>>& tree, const std::vector<T>& points, s
     }
 }
 
-template <typename T>
-std::vector<Polynomial<T>> evaluate(const Polynomial<T>& f, const std::vector<Polynomial<T>>& tree, size_t k, size_t idx = 0) {
+template<typename T>
+std::vector<Polynomial<T>>
+evaluate(const Polynomial<T> &f, const std::vector<Polynomial<T>> &tree, size_t k, size_t idx = 0) {
+
+    /*
+     * Helper function recursively going through the tree for the fast multipoint evaluation
+     */
+
     std::vector<Polynomial<T>> result;
 
     if (idx >= tree.size() / 2) {
@@ -432,12 +454,17 @@ std::vector<Polynomial<T>> evaluate(const Polynomial<T>& f, const std::vector<Po
 
 template<typename T>
 std::vector<T> Polynomial<T>::TreeMultipointEval(const std::vector<T> &points) const {
+
+    /*
+     * Tree based with sub products algorithm for O(nlog(n)) multipoint evaluation
+     */
+
     if (points.empty()) { return {}; }
     if (points.size() == 1) { return {this->operator()(points[0])}; }
     auto m = points.size();
-    size_t TreeSize=(1<<(m+1))-1;
+    size_t TreeSize = (1 << (m + 1)) - 1;
     std::vector<Polynomial<T>> tree(TreeSize);
-    buildTree(tree,points,m);
+    buildTree(tree, points, m);
     std::vector<T> ans;
 
 
@@ -478,7 +505,7 @@ std::vector<T> Polynomial<T>::TreeMultipointEval(const std::vector<T> &points) c
 //    return results;
 //}
 
-Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
+inline Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
     std::random_device rd;
     std::mt19937 G(rd());
     std::uniform_int_distribution unif(inf, sup);
@@ -489,19 +516,22 @@ Polynomial<int> generateRandomIntPolynomial(const int &n, int inf, int sup) {
 }
 
 template<typename T, typename Distribution, typename Generator>
-Polynomial<T> generateRandomPolynomial(int n, Distribution &distribution, Generator &generator) {
+inline Polynomial<T> generateRandomPolynomial(int degree, Distribution &distribution, Generator &generator) {
     std::random_device rd;
     auto gen = [&generator, &distribution]() { return distribution(generator); };
-    std::vector<T> v(n + 1);
+    std::vector<T> v(degree + 1);
     std::ranges::generate(v, gen);
     return Polynomial<T>(v);
 }
 
 template<typename T>
 void Polynomial<T>::adjust() {
-//    Here we optimize condition order by lowest to highest probability,
-//    since the second condition will not be checked if first one is false.
-//    The while loop may not be ideal
+
+    /* Here we optimize condition order by lowest to highest probability,
+     * since the second condition will not be checked if first one is false.
+     * The while loop may not be ideal
+     */
+
     while ((is_zero(coefficients[n])) && (n >= 0)) {
         n--;
     }
