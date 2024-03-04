@@ -316,23 +316,39 @@ public:
 
 template<typename T>
 Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
+    /*
+     * Points are expected to be in increasing order (for the Xs) and distinct.
+     * This implementation does not check those conditions
+     */
     if (points.size() == 0) { return Polynomial<T>(); }
     if (points.size() == 1) { return Polynomial<T>(points[0].second); }
     auto m = points.size();
     Polynomial<T> ans;
-
     for (int i = 0; i < m; ++i) {
-        Polynomial<T> temp({points[i].second});
+        Polynomial<T> temp({1});
         for (int j = 0; j < m; ++j) {
-            if (i == j) { continue; }
-            temp *= Polynomial<T>(
-                    {-points[j].second / (points[i].first - points[j].first), 1 / (points[i].first - points[j].first)});
+            if (j != i) {
+                temp *= Polynomial<T>(
+                        {-points[j].first / (points[i].first - points[j].first),
+                         1 / (points[i].first - points[j].first)});
+            }
         }
-//        std::cout << "temp" << i << " " << temp << " ";
-        ans += temp;
-//        std::cout << "ans" << i << " " << temp << " ";
-
+        std::cout << Polynomial<T>({points[i].second}) * temp << std::endl;
+        ans += Polynomial<T>({points[i].second}) * temp;
     }
+
+//    for (int i = 0; i < m; ++i) {
+//        Polynomial<T> temp({points[i].second});
+//        for (int j = 0; j < m; ++j) {
+//            if (i == j) { continue; }
+//            temp *= Polynomial<T>(
+//                    {-points[j].second / (points[j].first - points[i].first), 1 / (points[i].first - points[j].first)});
+//        }
+////        std::cout << "temp" << i << " " << temp << " ";
+//        ans += temp;
+////        std::cout << "ans" << i << " " << temp << " ";
+//
+//    }
 //    std::cout << "ans= ";
     return ans;
 }
@@ -526,13 +542,10 @@ inline Polynomial<T> generateRandomPolynomial(int degree, Distribution &distribu
 
 template<typename T>
 void Polynomial<T>::adjust() {
-
-    /* Here we optimize condition order by lowest to highest probability,
-     * since the second condition will not be checked if first one is false.
+    /*
      * The while loop may not be ideal
      */
-
-    while ((is_zero(coefficients[n])) && (n >= 0)) {
+    while ((n >= 0) && (is_zero(coefficients[n]))) {
         n--;
     }
     coefficients.resize(n + 1);
