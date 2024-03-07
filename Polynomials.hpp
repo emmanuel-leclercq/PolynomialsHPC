@@ -26,7 +26,7 @@ template<typename T1, typename T2>
 inline Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
 template<typename T1, typename T2>
-inline Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
+inline Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, T2);
 
 template<typename T1, typename T2>
 inline Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
@@ -241,9 +241,9 @@ public:
 
     void derivative(int k = 1);
 
-    [[nodiscard]] inline T &dominant() { return coefficients[n]; }
+    [[nodiscard]] T &dominant() { return coefficients[n]; }
 
-    [[nodiscard]] inline bool is_sparse() const;
+    [[nodiscard]] bool is_sparse() const;
 
     T operator[](int i) const { return (i >= 0 && i <= n) ? coefficients[i] : 0; }
 
@@ -287,8 +287,6 @@ public:
 
     friend std::ostream &operator
     <<<>(std::ostream &, const Polynomial<T> &);
-
-    friend Polynomial<T> derivative<T>(Polynomial<T> P, int k);
 
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Polynomial<T2> &b);
@@ -425,8 +423,8 @@ void buildTree(std::vector<Polynomial<T>> &tree, const std::vector<T> &points, s
      */
 
     if (idx >= tree.size() / 2) {
-        size_t pointIdx = idx - tree.size() / 2;
-        if (pointIdx < points.size()) {
+        ;
+        if (size_t pointIdx = idx - tree.size() / 2 < points.size()) {
             tree[idx] = Polynomial<T>{-points[pointIdx], 1};  // M_0,j = X - u_j
         }
         return;
@@ -758,7 +756,7 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
         for (int i = p.n; i > 0; --i) {
             if (!is_zero(p.coefficients[i])) {
 
-                if (i != p.degree())[[likely]] {
+                if (i != p.degree()) {
                     if (should_add_plus(p.coefficients[i])) {
                         out << " +";
                     }
@@ -770,7 +768,7 @@ std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
                 if (!is_one(p.coefficients[i]) && !is_one(-p.coefficients[i])) {
                     out << std::abs(p.coefficients[i]);
                 }
-                if (i > 1)[[likely]] { out << var << "^" << i; }
+                if (i > 1) { out << var << "^" << i; }
                 if (i == 1) { out << var; }
             }
         }
