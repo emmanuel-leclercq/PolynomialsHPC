@@ -28,7 +28,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 enable_testing()
 file(GLOB_RECURSE SOURCES "test/dense/*.cpp" )
 add_executable(tests ${SOURCES})
-#
+
 target_link_libraries(tests gtest_main)
 include(GoogleTest)
 gtest_discover_tests(tests)

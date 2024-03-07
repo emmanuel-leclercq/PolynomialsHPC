@@ -627,7 +627,7 @@ SparsePolynomial<decltype(T1() * T2())> operator/(const SparsePolynomial<T1> &P,
 }
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {
 
 }
 
