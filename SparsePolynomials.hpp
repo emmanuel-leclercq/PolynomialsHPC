@@ -647,9 +647,11 @@ SparsePolynomial<decltype(T1() * T2())> operator*=(SparsePolynomial<T1> &A, Spar
 }
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {}
+SparsePolynomial<decltype(T1() * T2())>
+operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO */}
 
 template<typename T1, typename T2>
-SparsePolynomial<decltype(T1() * T2())> operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {}
+SparsePolynomial<decltype(T1() * T2())>
+operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO */}
 
 #endif //POLYNOMIALSHPC_SPARSEPOLYNOMIALS_HPP
