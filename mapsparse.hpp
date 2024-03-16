@@ -4,7 +4,7 @@
 /*
  * We try a different sparse implementation using a map.
  * The point being the ability to have monomials natively ordered by degree.
- * We will try to replicqte the performances of the linked list implementation
+ * We will try to replicate the performances of the linked list implementation
  * both in terms of memory and speed.
  */
 #ifndef POLYNOMIALSHPC_MAPSPARSE_HPP
