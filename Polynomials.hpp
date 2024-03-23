@@ -312,7 +312,16 @@ public:
 
 };
 
-template<typename T>
+template <typename T1, typename T2>
+std::vector<T2> find_roots(const Polynomial<T1> & P){
+    if(P.degree()==1){return std::vector<T2> ({-P[1]/P[0]});}
+    if(P.degree()==2){}
+    if(P.degree()==3){}
+    else{}
+    return std::vector<T2>();
+}
+
+template <typename T>
 Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
     /*
      * Points are expected to be in increasing order (for the Xs) and distinct.
@@ -334,20 +343,6 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
         std::cout << Polynomial<T>({points[i].second}) * temp << std::endl;
         ans += Polynomial<T>({points[i].second}) * temp;
     }
-
-//    for (int i = 0; i < m; ++i) {
-//        Polynomial<T> temp({points[i].second});
-//        for (int j = 0; j < m; ++j) {
-//            if (i == j) { continue; }
-//            temp *= Polynomial<T>(
-//                    {-points[j].second / (points[j].first - points[i].first), 1 / (points[i].first - points[j].first)});
-//        }
-////        std::cout << "temp" << i << " " << temp << " ";
-//        ans += temp;
-////        std::cout << "ans" << i << " " << temp << " ";
-//
-//    }
-//    std::cout << "ans= ";
     return ans;
 }
 
@@ -423,7 +418,7 @@ void buildTree(std::vector<Polynomial<T>> &tree, const std::vector<T> &points, s
      */
 
     if (idx >= tree.size() / 2) {
-        ;
+
         if (size_t pointIdx = idx - tree.size() / 2 < points.size()) {
             tree[idx] = Polynomial<T>{-points[pointIdx], 1};  // M_0,j = X - u_j
         }
@@ -734,7 +729,6 @@ bool operator==(const Polynomial<T1> &P, const Polynomial<T2> &Q) {
 
 template<typename T>
 std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p) {
-    // +/- implementation ?
     char var;
     if constexpr (std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>> ||
                   std::is_same_v<T, std::complex<long double>>) {
