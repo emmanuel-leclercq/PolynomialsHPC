@@ -131,3 +131,6 @@ public:
 
     inline size_t operator()() const { return value; }
 };
+
+template <typename T>
+concept is_complex=std::is_same_v<T, std::complex<typename T::value_type>>;

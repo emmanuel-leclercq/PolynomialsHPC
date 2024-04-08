@@ -338,7 +338,7 @@ std::vector<T2> find_roots(const Polynomial<T1> &P)
         }
         else
         {
-            if (std::is_complex<T2>)
+            if (is_complex<T2>)
             {
                 return std::vector<T2>({{-P[1] / (2 * P[2]), -sqrt(-delta) / (2 * P[2])}, {-P[1] / (2 * P[2]), sqrt(-delta) / (2 * P[2])}});
             }
@@ -358,7 +358,6 @@ std::vector<T2> find_roots(const Polynomial<T1> &P)
     {
     }
     return std::vector<T2>();
-}
 }
 
 template <typename T>
@@ -863,8 +862,7 @@ template <typename T>
 std::ostream &operator<<(std::ostream &out, const Polynomial<T> &p)
 {
     char var;
-    if constexpr (std::is_same_v<T, std::complex<float>> || std::is_same_v<T, std::complex<double>> ||
-                  std::is_same_v<T, std::complex<long double>>)
+    if constexpr (is_complex<T>)
     {
         var = 'z';
         for (int i = p.n; i > 1; --i)
