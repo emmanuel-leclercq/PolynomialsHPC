@@ -211,9 +211,9 @@ public:
     ~Polynomial() = default;
 
     //    iterators
-    auto begin() const { return coefficients.begin(); }
+    [[nodiscard]] auto begin() const { return coefficients.begin(); }
 
-    auto end() const { return coefficients.end(); }
+    [[nodiscard]] auto end() const { return coefficients.end(); }
 
     //  Basic accessors/mutators
     [[nodiscard]] int degree() const { return n; }
