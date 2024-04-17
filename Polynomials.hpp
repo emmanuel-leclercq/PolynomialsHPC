@@ -182,15 +182,15 @@ private:
 public:
     //    Constructors
     //    Default polynomial is 0, degree=-1 for convenience
-    Polynomial() : n(-1), coefficients(0) {}
+    Polynomial() : coefficients(0), n(-1) {}
 
     //    Single coefficient polynomial
-    explicit Polynomial(const T &a, const int &m = 0) : n(m), coefficients(m + 1, 0) {
+    explicit Polynomial(const T &a, const int &m = 0) : coefficients(m + 1, 0), n(m) {
         coefficients[n] = a;
         adjust();
     }
 
-    explicit Polynomial(const T &&a, const int &m = 0) : n(m), coefficients(m + 1, 0) {
+    explicit Polynomial(const T &&a, const int &m = 0) : coefficients(m + 1, 0), n(m) {
         coefficients[n] = std::move(a);
         adjust();
     }
@@ -320,7 +320,7 @@ std::vector<Precision> solveRealRoots(const Polynomial<CoeffType> &P) {
 
     }
 
-    if (P.degree() == 3){}
+    if (P.degree() == 3) {}
 
     return roots;
 }
@@ -357,9 +357,9 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
     }
     auto m = points.size();
     Polynomial<T> ans;
-    for (int i = 0; i < m; ++i) {
+    for (long unsigned int i = 0; i < m; ++i) {
         Polynomial<T> temp({1});
-        for (int j = 0; j < m; ++j) {
+        for (long unsigned int j = 0; j < m; ++j) {
             if (j != i) {
                 temp *= Polynomial<T>(
                         {-points[j].first / (points[i].first - points[j].first),
@@ -837,7 +837,7 @@ Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Pol
     } else {
         std::vector<std::complex<double>> fa(a.coefficients.begin(), a.coefficients.end());
         std::vector<std::complex<double>> fb(b.coefficients.begin(), b.coefficients.end());
-        int n = 1;
+        long unsigned int n = 1;
         while (n < a.coefficients.size() + b.coefficients.size()) {
             n <<= 1;
         }
@@ -846,14 +846,14 @@ Polynomial<decltype(T1() * T2())> fftmultiply(const Polynomial<T1> &a, const Pol
 
         fft(fa, false);
         fft(fb, false);
-        for (int i = 0; i < n; i++) {
+        for (long unsigned int i = 0; i < n; i++) {
             fa[i] *= fb[i];
         }
         fft(fa, true);
 
         Polynomial<decltype(T1() * T2())> result;
         result.coefficients.reserve(n);
-        for (int i = 0; i < n; i++) {
+        for (long unsigned int i = 0; i < n; i++) {
             result.coefficients[i] = round(fa[i].real());
         }
         result.n = a.n + b.n;
