@@ -311,11 +311,12 @@ std::vector<Precision> solveRealRoots(const Polynomial<CoeffType> &P) {
 
     if (P.degree() == 2) {
         auto delta = P[1] * P[1] - 4 * P[2] * P[0];
+        std::cout << "delta=" << delta << std::endl;
         if (delta >= 0) {
-            roots.push_back(-static_cast<Precision>(P[1]) -
-                            sqrt(static_cast<Precision>(delta)) / (2 * static_cast<Precision>(P[2])));
-            roots.push_back(-static_cast<Precision>(P[1]) +
-                            sqrt(static_cast<Precision>(delta)) / (2 * static_cast<Precision>(P[2])));
+            roots.push_back((-static_cast<Precision>(P[1]) -
+                            sqrt(static_cast<Precision>(delta))) / (2 * static_cast<Precision>(P[2])));
+            roots.push_back((-static_cast<Precision>(P[1]) +
+                            sqrt(static_cast<Precision>(delta))) / (2 * static_cast<Precision>(P[2])));
         }
 
     }
@@ -366,7 +367,6 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
                          1 / (points[i].first - points[j].first)});
             }
         }
-        std::cout << Polynomial<T>({points[i].second}) * temp << std::endl;
         ans += Polynomial<T>({points[i].second}) * temp;
     }
     return ans;
