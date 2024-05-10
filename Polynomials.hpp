@@ -362,7 +362,7 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
         Polynomial<T> temp({1});
         for (long unsigned int j = 0; j < m; ++j) {
             if (j != i) {
-                temp *= Polynomial<T>(
+                temp *= Polynomial<T>(std::vector<T>
                         {-points[j].first / (points[i].first - points[j].first),
                          1 / (points[i].first - points[j].first)});
             }
@@ -380,7 +380,7 @@ Polynomial<T>::Polynomial(const std::vector<T> &roots, bool fromRoots) {
     if (fromRoots) {
         *this = Polynomial<T>({1});
         for (const auto &root: roots) {
-            *this = *this * Polynomial<T>({-root, 1});
+            *this = *this * Polynomial<T>(std::vector<T>{-root, 1});
         }
     } else {
         *this = Polynomial<T>(roots);
