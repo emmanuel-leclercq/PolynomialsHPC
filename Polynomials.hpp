@@ -227,9 +227,9 @@ public:
     template<typename U>
     std::vector<T> operator()(const std::vector<U> &) const;
 
-    std::vector<T> RawMultipointEval(const std::vector<T> &points) const;
+    [[nodiscard]] std::vector<T> RawMultipointEval(const std::vector<T> &points) const;
 
-    std::vector<T> TreeMultipointEval(const std::vector<T> &points) const;
+    [[nodiscard]] std::vector<T> TreeMultipointEval(const std::vector<T> &points) const;
 
     void derivative(int k = 1);
 
@@ -254,7 +254,7 @@ public:
     friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const Polynomial<T2> &);
 
     template<typename T1, typename T2>
-    friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, const T2);
+    friend Polynomial<decltype(T1() * T2())> operator/(const Polynomial<T1> &, T2);
 
     template<typename T1, typename T2>
     friend Polynomial<decltype(T1() * T2())> operator%(const Polynomial<T1> &, const Polynomial<T2> &);
@@ -350,7 +350,7 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
      * Points are expected to be in increasing order (for the Xs) and distinct.
      * This implementation does not check those conditions
      */
-    if (points.size() == 0) {
+    if (points.empty()) {
         return Polynomial<T>();
     }
     if (points.size() == 1) {
