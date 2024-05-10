@@ -373,7 +373,7 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
 }
 
 template<typename T>
-Polynomial<T>::Polynomial(const std::vector<T> &roots, bool fromRoots) {
+Polynomial<T>::Polynomial(const std::vector<T> &roots, const bool fromRoots) {
     /*
      * creating a polynomial from roots if bool parameter set to True
      */
