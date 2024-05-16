@@ -300,28 +300,31 @@ public:
     //    };
 };
 
-template<typename CoeffType, typename Precision = double>
-std::vector<Precision> solveRealRoots(const Polynomial<CoeffType> &P) {
+template<typename coeffType, typename precision = double>
+std::vector<precision> solveRealRoots(const Polynomial<coeffType> &P) {
 
-    std::vector<Precision> roots;
+    std::vector<precision> roots;
 
     if (P.degree() == 1) {
-        roots.push_back(static_cast<Precision>(-P[0]) / static_cast<Precision>(P[1]));
+        roots.push_back(static_cast<precision>(-P[0]) / static_cast<precision>(P[1]));
     }
 
     if (P.degree() == 2) {
         auto delta = P[1] * P[1] - 4 * P[2] * P[0];
         std::cout << "delta=" << delta << std::endl;
-        if (delta >= 0) {
-            roots.push_back((-static_cast<Precision>(P[1]) -
-                            sqrt(static_cast<Precision>(delta))) / (2 * static_cast<Precision>(P[2])));
-            roots.push_back((-static_cast<Precision>(P[1]) +
-                            sqrt(static_cast<Precision>(delta))) / (2 * static_cast<Precision>(P[2])));
+        if (delta == 0) { roots.push_back((-static_cast<precision>(P[1]) / (2 * static_cast<precision>(P[2])))); }
+        if (delta > 0) {
+            roots.push_back((-static_cast<precision>(P[1]) -
+                             sqrt(static_cast<precision>(delta))) / (2 * static_cast<precision>(P[2])));
+            roots.push_back((-static_cast<precision>(P[1]) +
+                             sqrt(static_cast<precision>(delta))) / (2 * static_cast<precision>(P[2])));
         }
 
     }
 
-    if (P.degree() == 3) {}
+    if (P.degree() == 3) {
+
+    }
 
     return roots;
 }
@@ -363,8 +366,8 @@ Polynomial<T> interpolate(const std::vector<std::pair<T, T>> &points) {
         for (long unsigned int j = 0; j < m; ++j) {
             if (j != i) {
                 temp *= Polynomial<T>(std::vector<T>
-                        {-points[j].first / (points[i].first - points[j].first),
-                         1 / (points[i].first - points[j].first)});
+                                              {-points[j].first / (points[i].first - points[j].first),
+                                               1 / (points[i].first - points[j].first)});
             }
         }
         ans += Polynomial<T>({points[i].second}) * temp;
