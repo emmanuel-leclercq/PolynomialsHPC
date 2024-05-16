@@ -311,8 +311,6 @@ std::vector<precision> solveRealRoots(const Polynomial<coeffType> &P) {
 
     if (P.degree() == 2) {
         auto delta = P[1] * P[1] - 4 * P[2] * P[0];
-        std::cout << "delta=" << delta << std::endl;
-        if (delta == 0) { roots.push_back((-static_cast<precision>(P[1]) / (2 * static_cast<precision>(P[2])))); }
         if (delta > 0) {
             roots.push_back((-static_cast<precision>(P[1]) -
                              sqrt(static_cast<precision>(delta))) / (2 * static_cast<precision>(P[2])));
@@ -323,26 +321,48 @@ std::vector<precision> solveRealRoots(const Polynomial<coeffType> &P) {
     }
 
     if (P.degree() == 3) {
+        // delta=18abcd - 4b^3d + b^2c^2 -4ac^3 -27a^2d^2
+        // a=P[3], b=P[2], c=P[1], d=P[0]
+        auto delta = 18 * P[0] * P[1] * P[2] * P[3]
+                     - 4 * P[2] * P[2] * P[2] * P[0]
+                     + P[2] * P[2] * P[1] * P[1]
+                     - 4 * P[3] * P[1] * P[1] * P[1]
+                     - 27 * P[3] * P[3] * P[0] * P[0];
+        if (delta == 0) {
+            roots.push_back(
+                    static_cast<precision>((9 * P[3] * P[0] - P[1] * P[2]) /
+                                           static_cast<precision>(2 * P[2] * P[2] - 6 * P[3] * P[1])));
+            roots.push_back(
+                    static_cast<precision>((9 * P[3] * P[0] - P[1] * P[2]) /
+                                           static_cast<precision>(2 * P[2] * P[2] - 6 * P[3] * P[1])));
+            roots.push_back(
+                    static_cast<precision>((4 * P[3] * P[2] * P[1] - 9 * P[3] * P[3] * P[0] - P[2] * P[2] * P[2]) /
+                                           static_cast<precision>(P[3] * P[2] * P[2] - 3 * P[3] * P[3] * P[1])));
+        }
+        if (delta > 0) {
+
+        }
 
     }
 
     return roots;
 }
 
-template<typename CoeffType, typename Precision = double>
-std::vector<std::complex<Precision>> solveComplexRoots(const Polynomial<CoeffType> &polynomial) {
+template<typename coefficientType, typename precision = double>
+std::vector<std::complex<precision>> solveComplexRoots(const Polynomial<coefficientType> &polynomial) {
     // Implementation for solving complex roots with user-specified precision
-    std::vector<std::complex<Precision>> roots;
+    std::vector<std::complex<precision>> roots;
     return roots;
 }
 
-template<typename CoeffType, typename Precision = double, typename ReturnType = Precision>
-auto solveRoots(const Polynomial<CoeffType> &polynomial) {
+template<typename coefficientType, typename precision = double, typename returnType = precision>
+std::vector<returnType> solveRoots(const Polynomial<coefficientType> &polynomial) {
     // Deduce the return type based on whether the polynomial has integer or floating-point roots
-    if constexpr (std::is_integral_v<CoeffType>) {
-        return solveRealRoots<CoeffType, ReturnType>(polynomial); // Solve for real roots with integer coefficients
+    if constexpr (std::is_floating_point_v<returnType> || std::is_integral_v<returnType) {
+        return solveRealRoots<coefficientType, returnType>(
+                polynomial); // Solve for real roots with integer coefficients
     } else {
-        return solveComplexRoots<CoeffType, ReturnType>(
+        return solveComplexRoots<coefficientType, returnType>(
                 polynomial); // Solve for complex roots with floating-point coefficients
     }
 }

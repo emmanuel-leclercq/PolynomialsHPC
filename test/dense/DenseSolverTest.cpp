@@ -15,7 +15,7 @@ namespace {
 
         std::vector<int> Rootsp1 = solveRoots<int, int>(p1);
         EXPECT_EQ(Rootsp1, v1);
-//        std::vector<double> Rootsp2 = solveRoots<double, double>(p2);
+        std::vector<double> Rootsp2 = solveRoots<double, double>(p2);
 
 
     }
