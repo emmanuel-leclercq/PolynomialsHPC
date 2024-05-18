@@ -358,7 +358,7 @@ std::vector<std::complex<precision>> solveComplexRoots(const Polynomial<coeffici
 template<typename coefficientType, typename precision = double, typename returnType = precision>
 std::vector<returnType> solveRoots(const Polynomial<coefficientType> &polynomial) {
     // Deduce the return type based on whether the polynomial has integer or floating-point roots
-    if constexpr (std::is_floating_point_v<returnType> || std::is_integral_v<returnType) {
+    if constexpr (std::is_floating_point_v<returnType> || std::is_integral_v<returnType>) {
         return solveRealRoots<coefficientType, returnType>(
                 polynomial); // Solve for real roots with integer coefficients
     } else {
