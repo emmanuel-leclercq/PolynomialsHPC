@@ -93,11 +93,11 @@ private:
     T coefficient;
 
 public:
-    Monomial() : coefficient(0), n(-1) {}
+    Monomial() : n(-1), coefficient(0) {}
 
-    Monomial(const T &a, const int &m = 0) : coefficient(a), n(m) {}
+    Monomial(const T &a, const int &m = 0) : n(m), coefficient(a) {}
 
-    Monomial(const T &&a, const int &m = 0) : coefficient(a), n(m) {}
+    Monomial(const T &&a, const int &m = 0) : n(m), coefficient(a) {}
 
     /*
      * Ordering by degree
