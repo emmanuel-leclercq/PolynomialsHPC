@@ -8,6 +8,7 @@
 using std::cout;
 using std::endl;
 using std::vector;
+using namespace Polynomial;
 
 int main() {
 
@@ -15,31 +16,31 @@ int main() {
     * Testing constructors
     */
 
-    Polynomial<double> q;
+    Dense<double> q;
     cout << "Default polynomial degree : " << q.degree() << endl;
 
-    Polynomial<int> p1({6, 3, 0, 1, 5});
+    Dense<int> p1({6, 3, 0, 1, 5});
 
-    Polynomial<int> p2({1, 0, 1});
+    Dense<int> p2({1, 0, 1});
 
-    Polynomial<int> p3({6, 3, 0, 1, 5});
+    Dense<int> p3({6, 3, 0, 1, 5});
 
     std::complex<double> a(2.0, 1.0);
     std::complex<double> b(0.0, 1.0);
-    Polynomial<std::complex<double>> pc({a, b});
+    Dense<std::complex<double>> pc({a, b});
 
     std::complex one = 1;
     cout << "Is one one : " << is_one(one) << endl;
 
     cout << "is 2+i zero : " << is_zero(a) << endl;
-    cout << Polynomial(a, 3) << endl;
+    cout << Dense(a, 3) << endl;
     cout << endl;
 
     cout << "p1 : " << p1 << endl;
     cout << "p2 : " << p2 << endl;
     cout << endl;
 
-    Polynomial<double> withRoots({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, true);
+    Dense<double> withRoots({1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}, true);
     cout << "Building polynomial from roots 1,2,3,...,12: " << withRoots << endl << endl;
     std::vector<double> points{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
     auto ans{withRoots.RawMultipointEval(points)};
@@ -50,10 +51,10 @@ int main() {
     /*
     * Testing basic operations
     */
-    Polynomial<int> sum = p1 + p2;
-    Polynomial<int> diff = p1 - p2;
-    Polynomial<int> diff2 = p2 - p1;
-    Polynomial<int> prod = p1 * p2;
+    Dense<int> sum = p1 + p2;
+    Dense<int> diff = p1 - p2;
+    Dense<int> diff2 = p2 - p1;
+    Dense<int> prod = p1 * p2;
     cout << "p1+p2 : " << sum << endl;
     cout << "p1-p2 : " << diff << endl;
     cout << "p2-p1 : " << diff2 << endl;
@@ -63,8 +64,8 @@ int main() {
     cout << endl;
 
     // Division and remainder
-    Polynomial<int> div = p1 / p2;
-    Polynomial<int> remainder = p1 % p2;
+    Dense<int> div = p1 / p2;
+    Dense<int> remainder = p1 % p2;
     cout << "Quotient p1 / p2: " << div << endl;
     cout << "Remainder p1 % p2: " << remainder << endl;
     cout << "p1 / 3: " << p1 / 3 << endl;

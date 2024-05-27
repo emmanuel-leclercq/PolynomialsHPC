@@ -15,6 +15,7 @@
 #include "utils.hpp"
 #include "Polynomials.hpp"
 
+namespace Polynomial {
 /*
  * Template declarations
  */
@@ -205,7 +206,7 @@ public:
     /*
      * Conversion from dense to sparse, with optional check for sparsity (more than half zeros)
      */
-    explicit SparsePolynomial(const Polynomial<T> &P, bool check_sparsity = false);
+    explicit SparsePolynomial(const Polynomial::Dense<T> &P, bool check_sparsity = false);
 
     //  Default destructor will be used, standard data types
     ~SparsePolynomial() = default;
@@ -235,7 +236,8 @@ public:
 
     void derivative(int k = 1);
 
-    friend SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k);
+    template<typename U>
+    friend SparsePolynomial<U> derivative(SparsePolynomial<U> P, int k);
 
     friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
     euclid_div(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
@@ -441,7 +443,7 @@ SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &&coeff
 }
 
 template<typename T>
-SparsePolynomial<T>::SparsePolynomial(const Polynomial<T> &P, bool check_sparsity) {
+SparsePolynomial<T>::SparsePolynomial(const Polynomial::Dense<T> &P, bool check_sparsity) {
     if (check_sparsity && !P.is_sparse()) {
         throw std::invalid_argument(
                 "The polynomial is not sparse enough, to force conversion set second parameter to false");
@@ -653,5 +655,7 @@ operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO 
 template<typename T1, typename T2>
 SparsePolynomial<decltype(T1() * T2())>
 operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO */}
+
+}
 
 #endif //POLYNOMIALSHPC_SPARSEPOLYNOMIALS_HPP

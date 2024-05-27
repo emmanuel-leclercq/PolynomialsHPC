@@ -11,6 +11,7 @@ using std::cout;
 using std::endl;
 using std::list;
 using std::vector;
+using namespace Polynomial;
 
 int main() {
     /*
@@ -61,7 +62,7 @@ int main() {
     cout << "U: " << U << endl;
 
     cout << "constructing U from Polynomial<double>" << endl;
-    Polynomial poly1(vector1);
+    Dense poly1(vector1);
     cout << "dense version: " << poly1 << endl;
     SparsePolynomial P(poly1);
     cout << "Sparse version P: " << P << endl;

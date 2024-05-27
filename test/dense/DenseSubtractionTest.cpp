@@ -1,15 +1,16 @@
 //
 // Created by Emmanuel Leclercq on 26/12/2023.
 //
-#include <iostream>
 #include "Polynomials.hpp"
 
 #include "gtest/gtest.h"
+
+using namespace Polynomial;
 namespace {
     TEST(SubtractionTest, Trivial) {
-        Polynomial<int> p1{{6, 3, 0, 1, 5}};
-        Polynomial<int> p2{{1, 0, 1}};
-        Polynomial<int> p3{{5, 3, -1, 1, 5}};
+        Dense<int> p1{{6, 3, 0, 1, 5}};
+        Dense<int> p2{{1, 0, 1}};
+        Dense<int> p3{{5, 3, -1, 1, 5}};
 
         EXPECT_EQ(p1 - p2, p3);
     }

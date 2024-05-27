@@ -7,13 +7,14 @@
 #include <iostream>
 #include <vector>
 
+using namespace Polynomial;
 int main() {
 
     std::vector<int> v1{6, 3, 0, 1, 5};
-    Polynomial<int> p1(v1);
+    Dense<int> p1(v1);
 
     std::vector<int> v2{1, 0, 1};
-    Polynomial<int> p2(v2);
+    Dense<int> p2(v2);
     auto ans = fftmultiply(p1, p2);
     auto cant = cantor(p1, p2);
     std::cout << p1 << std::endl;

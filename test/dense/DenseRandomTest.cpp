@@ -1,10 +1,11 @@
 //
 // Created by Emmanuel Leclercq on 26/12/2023.
 //
-#include <iostream>
 #include "Polynomials.hpp"
 
 #include "gtest/gtest.h"
+
+using namespace Polynomial;
 namespace {
     TEST(RandomTest, Unif) {
         auto P = generateRandomIntPolynomial(100, 0, 1);
