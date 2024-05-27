@@ -6,6 +6,6 @@
 #include <iostream>
 #include "utils.hpp"
 
-int main(){
+int main() {
     return 0;
 }

@@ -13,8 +13,9 @@ namespace {
          * This test is not ideal: there is a non-zero
          * (although very low) probability that the polynomial is zero
          */
-    EXPECT_NE(P.degree(),0);
-}
+        EXPECT_NE(P.degree(), 0);
+    }
+
     TEST(RandomTest, CustomGenerator) {
         std::random_device rd;
         std::mt19937 mt_generator(rd());
@@ -23,6 +24,6 @@ namespace {
 
         auto Q = generateRandomPolynomial<double>(30, double_distribution, def_generator);
 
-        EXPECT_EQ(Q.degree(),30);
+        EXPECT_EQ(Q.degree(), 30);
     }
 }

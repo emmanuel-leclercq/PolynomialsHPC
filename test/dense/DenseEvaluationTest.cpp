@@ -18,7 +18,7 @@ namespace {
     TEST(EvaluationTest, MultiPoint) {
         std::vector<int> roots{1, 2, 3, 4,};
         Dense<int> P(roots, true);
-        std::vector<int> ans{0,0,0,0};
-        EXPECT_EQ(P(roots),ans);
+        std::vector<int> ans{0, 0, 0, 0};
+        EXPECT_EQ(P(roots), ans);
     }
 }
