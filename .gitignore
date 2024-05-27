@@ -1,6 +1,6 @@
 /cmake-build-debug
 /.vscode
 /.idea
+/.cache
 /build
 brouillon.cpp
-
