@@ -5,13 +5,15 @@
 #include "SparsePolynomials.hpp"
 
 #include "gtest/gtest.h"
+
+using namespace Polynomial;
 namespace {
 
     TEST(MonomialTest, basic) {
-        Polynomial::Monomial<int> m;
-        Polynomial::Monomial m1(2, 2);
-        Polynomial::Monomial m2(1, 3);
-        auto zero = Polynomial::Monomial<int>(0);
+        Monomial<int> m;
+        Monomial m1(2, 2);
+        Monomial m2(1, 3);
+        auto zero = Monomial<int>(0);
 
 
         EXPECT_EQ(m, 0);
