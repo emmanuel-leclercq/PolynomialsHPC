@@ -5,7 +5,6 @@
 #include "SparsePolynomials.hpp"
 
 #include "gtest/gtest.h"
-
 namespace {
 
     TEST(MonomialTest, basic) {
