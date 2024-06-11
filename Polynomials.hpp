@@ -306,7 +306,8 @@ namespace Polynomial {
         template<typename T1, typename T2>
         friend bool operator==(const Dense<T1> &, const Dense<T2> &);
 
-        friend std::ostream &operator<<<>(std::ostream &, const Dense<T> &);
+        friend std::ostream &operator
+        <<<>(std::ostream &, const Dense<T> &);
 
         template<typename T1, typename T2>
         friend Dense<decltype(T1() * T2())> fftmultiply(const Dense<T1> &a,
@@ -375,6 +376,7 @@ namespace Polynomial {
                                          P[2] * P[2] * P[2]) /
                                         static_cast<precision>(P[3] * P[2] * P[2] - 3 * P[3] * P[3] * P[1])));
             }
+            /*TODO*/
             if (delta > 0) {
             }
         }
