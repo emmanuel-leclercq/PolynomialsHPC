@@ -55,6 +55,9 @@ namespace Polynomial {
     std::ostream &operator<<(std::ostream &, const Sparse<T> &);
 
     template<typename T1, typename T2>
+    bool operator==(const Sparse<T1> &, const Sparse<T2> &);
+
+    template<typename T1, typename T2>
     Sparse<decltype(T1() * T2())> operator+(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
@@ -234,6 +237,16 @@ namespace Polynomial {
         template<typename U>
         T operator()(const U &) const;
 
+        /*
+         * Accessing the Monomials by degree
+         */
+        template<std::integral n>
+        Monomial<T> operator[](n i) const {
+            auto it = std::find_if(monomials.begin(), monomials.end(),
+                                   [i](const Monomial<T> &m) { return m.degree() == i; });
+            return *it;
+        }
+
         void derivative(int k = 1);
 
         template<typename U>
@@ -248,6 +261,13 @@ namespace Polynomial {
 
         friend std::ostream &operator
         <<<>(std::ostream &, const Sparse<T> &);
+
+        template<typename T1, typename T2>
+        friend bool operator==(const Sparse<T1> &, const Sparse<T2> &);
+
+        bool operator!=(const Sparse &rhs) const {
+            return !(rhs == *this);
+        }
 
         template<typename T1, typename T2>
         friend Sparse<decltype(T1() * T2())>
@@ -289,6 +309,7 @@ namespace Polynomial {
         friend Sparse<decltype(T1() * T2())>
         operator%=(const Sparse<T1> &, const Sparse<T2> &);
     };
+
 
 /*
  * ! Zeros are stored too, maybe we can strip them immediately here,
@@ -508,6 +529,20 @@ namespace Polynomial {
             }
         }
         return out;
+    }
+
+    template<typename T1, typename T2>
+    bool operator==(const Sparse<T1> &P, const Sparse<T2> &Q) {
+        if (P.degree() != Q.degree()) { return false; }
+        auto it1 = P.begin();
+        auto it2 = Q.begin();
+        while (it1 != P.end() && it2 != Q.end()) {
+            if (*it1 != *it2) { return false; }
+            ++it1;
+            ++it2;
+        }
+//        return it1 == P.end() && it2 == Q.end();
+        return true;
     }
 
     template<typename T1, typename T2>
