@@ -42,47 +42,47 @@ namespace Polynomial {
     std::ostream &operator<<(std::ostream &, const Monomial<T> &);
 
     template<typename T>
-    class SparsePolynomial;
+    class Sparse;
 
     template<typename T>
-    SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k = 1);
+    Sparse<T> derivative(Sparse<T> P, int k = 1);
 
     template<typename T1, typename T2>
-    std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
-    heap_div(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    std::pair<Sparse<decltype(T1() * T2())>, Sparse<decltype(T1() * T2())>>
+    heap_div(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T>
-    std::ostream &operator<<(std::ostream &, const SparsePolynomial<T> &);
+    std::ostream &operator<<(std::ostream &, const Sparse<T> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator+(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator+(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator-(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator-(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator*(SparsePolynomial<T1> &, SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator*(Sparse<T1> &, Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator/(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator/(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator%(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator+=(const SparsePolynomial<T2> &, const SparsePolynomial<T1> &);
+    Sparse<decltype(T1() * T2())> operator+=(const Sparse<T2> &, const Sparse<T1> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator-=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator-=(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator*=(SparsePolynomial<T1> &, SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator*=(Sparse<T1> &, Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator/=(const Sparse<T1> &, const Sparse<T2> &);
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+    Sparse<decltype(T1() * T2())> operator%=(const Sparse<T1> &, const Sparse<T2> &);
 
 /*
  * Definition of the parent class monomial and all its methods
@@ -152,7 +152,7 @@ namespace Polynomial {
  */
 
     template<typename T>
-    class SparsePolynomial {
+    class Sparse {
     private:
         std::list<Monomial<T>> monomials;
         int n = -1;
@@ -164,52 +164,52 @@ namespace Polynomial {
          * considering certain data types make more sense for a sparse implementation,
          * and to reduce the need for preprocessing existing variables
          */
-        SparsePolynomial() : is_sorted(true) {}
+        Sparse() : is_sorted(true) {}
 
         /*
          * Constructors assuming input is not 'sparse', which spears us
          * the need to know the degree beforehand
          */
-        explicit SparsePolynomial(const std::vector<T> &coefficients);
+        explicit Sparse(const std::vector<T> &coefficients);
 
-        explicit SparsePolynomial(const std::vector<T> &&coefficients);
+        explicit Sparse(const std::vector<T> &&coefficients);
 
-        explicit SparsePolynomial(const std::list<T> &coefficients);
+        explicit Sparse(const std::list<T> &coefficients);
 
-        explicit SparsePolynomial(const std::list<T> &&coefficients);
+        explicit Sparse(const std::list<T> &&coefficients);
 
 
         /* It makes more sense to use degrees as keys considering the
          * vectorial structure of polynomials spaces
          */
-        explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients);
+        explicit Sparse(const std::map<int, T, std::greater<int>> &coefficients);
 
-        explicit SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients);
+        explicit Sparse(const std::map<int, T, std::greater<int>> &&coefficients);
 
-        explicit SparsePolynomial(const std::map<int, T> &coefficients);
+        explicit Sparse(const std::map<int, T> &coefficients);
 
-        explicit SparsePolynomial(const std::map<int, T> &&coefficients);
+        explicit Sparse(const std::map<int, T> &&coefficients);
 
-        explicit SparsePolynomial(const std::unordered_map<int, T> &coefficients);
+        explicit Sparse(const std::unordered_map<int, T> &coefficients);
 
-        explicit SparsePolynomial(const std::unordered_map<int, T> &&coefficients);
+        explicit Sparse(const std::unordered_map<int, T> &&coefficients);
 
-        explicit SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients);
+        explicit Sparse(const std::vector<std::pair<int, T>> &coefficients);
 
-        explicit SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients);
+        explicit Sparse(const std::vector<std::pair<int, T>> &&coefficients);
 
-        explicit SparsePolynomial(const std::list<std::pair<int, T>> &coefficients);
+        explicit Sparse(const std::list<std::pair<int, T>> &coefficients);
 
-        explicit SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients);
+        explicit Sparse(const std::list<std::pair<int, T>> &&coefficients);
 
 
         /*
          * Conversion from dense to sparse, with optional check for sparsity (more than half zeros)
          */
-        explicit SparsePolynomial(const Polynomial::Dense<T> &P, bool check_sparsity = false);
+        explicit Sparse(const Polynomial::Dense<T> &P, bool check_sparsity = false);
 
         //  Default destructor will be used, standard data types
-        ~SparsePolynomial() = default;
+        ~Sparse() = default;
 
         [[nodiscard]] int degree() const { return n; };
 
@@ -237,57 +237,57 @@ namespace Polynomial {
         void derivative(int k = 1);
 
         template<typename U>
-        friend SparsePolynomial<U> derivative(SparsePolynomial<U> P, int k);
+        friend Sparse<U> derivative(Sparse<U> P, int k);
 
-        friend std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
-        euclid_div(const SparsePolynomial<T> &, const SparsePolynomial<T> &);
+        friend std::pair<Sparse<T>, Sparse<T>>
+        euclid_div(const Sparse<T> &, const Sparse<T> &);
 
         template<typename T1, typename T2>
-        friend std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
-        heap_div(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend std::pair<Sparse<decltype(T1() * T2())>, Sparse<decltype(T1() * T2())>>
+        heap_div(const Sparse<T1> &, const Sparse<T2> &);
 
         friend std::ostream &operator
-        <<<>(std::ostream &, const SparsePolynomial<T> &);
+        <<<>(std::ostream &, const Sparse<T> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator+(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator+(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator-(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator-(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator*(SparsePolynomial<T1> &, SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator*(Sparse<T1> &, Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator/(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator/(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator%(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator%(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator+=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator+=(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator-=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator-=(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator*=(SparsePolynomial<T1> &, SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator*=(Sparse<T1> &, Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator/=(const Sparse<T1> &, const Sparse<T2> &);
 
         template<typename T1, typename T2>
-        friend SparsePolynomial<decltype(T1() * T2())>
-        operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &);
+        friend Sparse<decltype(T1() * T2())>
+        operator%=(const Sparse<T1> &, const Sparse<T2> &);
     };
 
 /*
@@ -295,7 +295,7 @@ namespace Polynomial {
  * without additional complexity?
 */
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &coefficients) {
+    Sparse<T>::Sparse(const std::vector<T> &coefficients) {
         int index = coefficients.size();
         n = index;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
@@ -305,7 +305,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::vector<T> &&coefficients) {
+    Sparse<T>::Sparse(const std::vector<T> &&coefficients) {
         int index = coefficients.size();
         n = index;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
@@ -315,7 +315,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::list<T> &coefficients) {
+    Sparse<T>::Sparse(const std::list<T> &coefficients) {
         int index = coefficients.size();
         n = index;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
@@ -325,7 +325,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::list<T> &&coefficients) {
+    Sparse<T>::Sparse(const std::list<T> &&coefficients) {
         int index = coefficients.size();
         n = index;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
@@ -335,7 +335,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T, std::greater<int>> &coefficients) {
         std::ranges::transform(coefficients, std::back_inserter(this->monomials),
                                [this](const std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
@@ -344,7 +344,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::map<int, T, std::greater<int>> &&coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T, std::greater<int>> &&coefficients) {
         std::ranges::transform(coefficients, std::back_inserter(this->monomials),
                                [this](std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
@@ -353,7 +353,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T> &coefficients) {
         std::ranges::transform(coefficients, std::front_inserter(this->monomials),
                                [this](const std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
@@ -362,7 +362,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::map<int, T> &&coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T> &&coefficients) {
         std::ranges::transform(coefficients.begin(), coefficients.end(), std::front_inserter(this->monomials),
                                [this](std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
@@ -371,7 +371,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &&coefficients) {
+    Sparse<T>::Sparse(const std::unordered_map<int, T> &&coefficients) {
         std::ranges::transform(coefficients, std::back_inserter(this->monomials),
                                [this](std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
@@ -381,7 +381,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::unordered_map<int, T> &coefficients) {
+    Sparse<T>::Sparse(const std::unordered_map<int, T> &coefficients) {
         /*
          * We could the unordered_map elements to a heap after transformation and then feed
          * the monomials list so that it comes out sorted, instead of sorting separately.
@@ -396,7 +396,7 @@ namespace Polynomial {
 
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &coefficients) {
+    Sparse<T>::Sparse(const std::vector<std::pair<int, T>> &coefficients) {
         /*
          * The input vector is assumed ordered by degree
          */
@@ -408,7 +408,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::vector<std::pair<int, T>> &&coefficients) {
+    Sparse<T>::Sparse(const std::vector<std::pair<int, T>> &&coefficients) {
         /*
          * The input vector is assumed ordered by degree
          */
@@ -420,7 +420,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &coefficients) {
+    Sparse<T>::Sparse(const std::list<std::pair<int, T>> &coefficients) {
         /*
          * The input list is assumed ordered by degree
          */
@@ -432,7 +432,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const std::list<std::pair<int, T>> &&coefficients) {
+    Sparse<T>::Sparse(const std::list<std::pair<int, T>> &&coefficients) {
         /*
          * The input list is assumed ordered by degree
          */
@@ -443,7 +443,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T>::SparsePolynomial(const Polynomial::Dense<T> &P, bool check_sparsity) {
+    Sparse<T>::Sparse(const Polynomial::Dense<T> &P, bool check_sparsity) {
         if (check_sparsity && !P.is_sparse()) {
             throw std::invalid_argument(
                     "The polynomial is not sparse enough, to force conversion set second parameter to false");
@@ -458,10 +458,10 @@ namespace Polynomial {
     }
 
     template<typename T>
-    void SparsePolynomial<T>::derivative(int k) {
+    void Sparse<T>::derivative(int k) {
         if (k == 0) { return; }
         if (degree() < k) {
-            *this = SparsePolynomial<T>();
+            *this = Sparse<T>();
             return;
         }
         if (k < 0) {
@@ -483,14 +483,14 @@ namespace Polynomial {
     }
 
     template<typename T>
-    SparsePolynomial<T> derivative(SparsePolynomial<T> P, int k) {
+    Sparse<T> derivative(Sparse<T> P, int k) {
         P.derivative(k);
         return P;
     }
 
     template<typename T>
     template<typename U>
-    T SparsePolynomial<T>::operator()(const U &x) const {
+    T Sparse<T>::operator()(const U &x) const {
         T result = 0;
         for (const auto &m: monomials) {
             result += m.coeff() * std::pow(x, m.degree());
@@ -499,7 +499,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    std::ostream &operator<<(std::ostream &out, const SparsePolynomial<T> &P) {
+    std::ostream &operator<<(std::ostream &out, const Sparse<T> &P) {
         for (auto it = P.monomials.begin(); it != P.monomials.end(); ++it) {
             out << *it;
             if (it != P.monomials.end() && std::next(it) != P.monomials.end()) {
@@ -511,9 +511,9 @@ namespace Polynomial {
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())>
-    operator+(const SparsePolynomial<T1> &lhs, const SparsePolynomial<T2> &rhs) {
-        SparsePolynomial<decltype(T1() * T2())> result;
+    Sparse<decltype(T1() * T2())>
+    operator+(const Sparse<T1> &lhs, const Sparse<T2> &rhs) {
+        Sparse<decltype(T1() * T2())> result;
         auto it1 = lhs.begin();
         auto it2 = rhs.begin();
         while (it1 != lhs.end() && it2 != rhs.end()) {
@@ -547,18 +547,18 @@ namespace Polynomial {
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())>
-    operator-(const SparsePolynomial<T1> &lhs, const SparsePolynomial<T2> &rhs) {
-        SparsePolynomial<decltype(T1() * T2())> result(rhs);
+    Sparse<decltype(T1() * T2())>
+    operator-(const Sparse<T1> &lhs, const Sparse<T2> &rhs) {
+        Sparse<decltype(T1() * T2())> result(rhs);
         std::ranges::transform(result.monomials, begin(result.monomials),
                                [](const Monomial<decltype(T1() * T2())> &m) { return negate(m); });
         return lhs + result;
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator*(SparsePolynomial<T1> &P, SparsePolynomial<T2> &Q) {
+    Sparse<decltype(T1() * T2())> operator*(Sparse<T1> &P, Sparse<T2> &Q) {
         std::priority_queue<Monomial<decltype(T1() * T2())>> heap;
-        SparsePolynomial<decltype(T1() * T2())> result;
+        Sparse<decltype(T1() * T2())> result;
         for (const auto &monoL: P) {
             for (const auto &monoR: Q) {
                 heap.push(monoL * monoR);
@@ -579,22 +579,22 @@ namespace Polynomial {
     }
 
     template<typename T>
-    std::pair<SparsePolynomial<T>, SparsePolynomial<T>>
-    euclid_div(const SparsePolynomial<T> &P, const SparsePolynomial<T> &Q) {
-        SparsePolynomial<T> quotient;
+    std::pair<Sparse<T>, Sparse<T>>
+    euclid_div(const Sparse<T> &P, const Sparse<T> &Q) {
+        Sparse<T> quotient;
         auto remainder = P;
         while (!remainder.monomials.empty() && remainder.monomials.back().degree() >= Q.monomials.back().degree()) {
 
         }
 
-        return std::pair<SparsePolynomial<T>, SparsePolynomial<T>>(quotient, remainder);
+        return std::pair<Sparse<T>, Sparse<T>>(quotient, remainder);
     }
 
     template<typename T1, typename T2>
-    std::pair<SparsePolynomial<decltype(T1() * T2())>, SparsePolynomial<decltype(T1() * T2())>>
-    heap_div(const SparsePolynomial<T1> &dividend, const SparsePolynomial<T2> &divisor) {
-        SparsePolynomial<decltype(T1() * T2())> quotient;
-        SparsePolynomial<decltype(T1() * T2())> remainder = dividend;
+    std::pair<Sparse<decltype(T1() * T2())>, Sparse<decltype(T1() * T2())>>
+    heap_div(const Sparse<T1> &dividend, const Sparse<T2> &divisor) {
+        Sparse<decltype(T1() * T2())> quotient;
+        Sparse<decltype(T1() * T2())> remainder = dividend;
         std::priority_queue<Monomial<decltype(T1() * T2())>> heap;
         for (const auto &mono: dividend) {
             heap.push(mono);
@@ -610,8 +610,8 @@ namespace Polynomial {
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator/(const SparsePolynomial<T1> &P, const SparsePolynomial<T2> &Q) {
-        SparsePolynomial<decltype(T1() * T2())> quotient;
+    Sparse<decltype(T1() * T2())> operator/(const Sparse<T1> &P, const Sparse<T2> &Q) {
+        Sparse<decltype(T1() * T2())> quotient;
         auto remainder = P;
 
         while (!remainder.monomials.empty() && remainder.monomials.back().degree() >= Q.monomials.back().degree()) {
@@ -619,7 +619,7 @@ namespace Polynomial {
             int leadDegree = remainder.monomials.back().degree() - Q.monomials.back().degree();
             quotient.monomials.push_back(Monomial<decltype(T1() * T2())>{leadCoeff, leadDegree});
 
-            SparsePolynomial<decltype(T1() * T2())> product;
+            Sparse<decltype(T1() * T2())> product;
             for (const auto &mono: Q) {
                 product.monomials.push_back(
                         Monomial<decltype(T1() * T2())>{mono.coeff() * leadCoeff, mono.degree() + leadDegree});
@@ -631,32 +631,32 @@ namespace Polynomial {
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator%(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {
+    Sparse<decltype(T1() * T2())> operator%(const Sparse<T1> &, const Sparse<T2> &) {
 
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator+=(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+    Sparse<decltype(T1() * T2())> operator+=(const Sparse<T1> &A, const Sparse<T2> &B) {
         return A + B;
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator-=(const SparsePolynomial<T1> &A, const SparsePolynomial<T2> &B) {
+    Sparse<decltype(T1() * T2())> operator-=(const Sparse<T1> &A, const Sparse<T2> &B) {
         return A - B;
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())> operator*=(SparsePolynomial<T1> &A, SparsePolynomial<T2> &B) {
+    Sparse<decltype(T1() * T2())> operator*=(Sparse<T1> &A, Sparse<T2> &B) {
         return A * B;
     }
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())>
-    operator/=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO */}
+    Sparse<decltype(T1() * T2())>
+    operator/=(const Sparse<T1> &, const Sparse<T2> &) {/* TODO */}
 
     template<typename T1, typename T2>
-    SparsePolynomial<decltype(T1() * T2())>
-    operator%=(const SparsePolynomial<T1> &, const SparsePolynomial<T2> &) {/* TODO */}
+    Sparse<decltype(T1() * T2())>
+    operator%=(const Sparse<T1> &, const Sparse<T2> &) {/* TODO */}
 
 }
 
