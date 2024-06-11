@@ -242,9 +242,8 @@ namespace Polynomial {
          */
         template<std::integral n>
         Monomial<T> operator[](n i) const {
-            auto it = std::find_if(monomials.begin(), monomials.end(),
-                                   [i](const Monomial<T> &m) { return m.degree() == i; });
-            return *it;
+            return *std::find_if(monomials.begin(), monomials.end(),
+                                 [i](const Monomial<T> &m) { return m.degree() == i; });
         }
 
         void derivative(int k = 1);

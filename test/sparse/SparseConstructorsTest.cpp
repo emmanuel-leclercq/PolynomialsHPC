@@ -6,3 +6,11 @@
 
 #include "gtest/gtest.h"
 
+using namespace Polynomial;
+namespace {
+
+    TEST(ConstructorTest, basic) {
+
+    }
+}
+
