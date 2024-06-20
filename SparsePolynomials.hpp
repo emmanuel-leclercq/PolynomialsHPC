@@ -99,9 +99,9 @@ namespace Polynomial {
     public:
         Monomial() : n(-1), coefficient(0) {}
 
-        Monomial(const T &a, const int &m = 0) : n(m), coefficient(a) {}
+        Monomial(const T &a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
 
-        Monomial(const T &&a, const int &m = 0) : n(m), coefficient(a) {}
+        Monomial(const T &&a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
 
         /*
          * Ordering by degree
@@ -185,9 +185,9 @@ namespace Polynomial {
         /* It makes more sense to use degrees as keys considering the
          * vectorial structure of polynomials spaces
          */
-        explicit Sparse(const std::map<int, T, std::greater<int>> &coefficients);
+        explicit Sparse(const std::map<int, T, std::greater<>> &coefficients);
 
-        explicit Sparse(const std::map<int, T, std::greater<int>> &&coefficients);
+        explicit Sparse(const std::map<int, T, std::greater<>> &&coefficients);
 
         explicit Sparse(const std::map<int, T> &coefficients);
 
@@ -316,7 +316,7 @@ namespace Polynomial {
     template<typename T>
     Sparse<T>::Sparse(const std::vector<T> &coefficients) {
         int index = coefficients.size();
-        n = index;
+        n = index - 1;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
             index--;
             if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
@@ -326,7 +326,7 @@ namespace Polynomial {
     template<typename T>
     Sparse<T>::Sparse(const std::vector<T> &&coefficients) {
         int index = coefficients.size();
-        n = index;
+        n = index - 1;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
             index--;
             if (p != 0) { monomials.push_back(Monomial<T>(std::move(p), index)); }
@@ -336,39 +336,43 @@ namespace Polynomial {
     template<typename T>
     Sparse<T>::Sparse(const std::list<T> &coefficients) {
         int index = coefficients.size();
-        n = index;
+        n = index - 1;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
             index--;
             if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
         });
+        this->adjust();
     }
 
     template<typename T>
     Sparse<T>::Sparse(const std::list<T> &&coefficients) {
         int index = coefficients.size();
-        n = index;
+        n = index - 1;
         std::ranges::for_each(coefficients | std::views::reverse, [&index, this](const T &p) {
             index--;
             if (p != 0) { monomials.push_back(Monomial<T>(p, index)); }
         });
+        this->adjust();
     }
 
     template<typename T>
-    Sparse<T>::Sparse(const std::map<int, T, std::greater<int>> &coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T, std::greater<>> &coefficients) {
         std::ranges::transform(coefficients, std::back_inserter(this->monomials),
                                [this](const std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(p.second, p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
-    Sparse<T>::Sparse(const std::map<int, T, std::greater<int>> &&coefficients) {
+    Sparse<T>::Sparse(const std::map<int, T, std::greater<>> &&coefficients) {
         std::ranges::transform(coefficients, std::back_inserter(this->monomials),
                                [this](std::pair<int, T> &p) {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(std::move(p.second), p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -378,6 +382,7 @@ namespace Polynomial {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(p.second, p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -387,6 +392,7 @@ namespace Polynomial {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(std::move(p.second), p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -397,6 +403,7 @@ namespace Polynomial {
                                    return Monomial<T>(std::move(p.second), p.first);
                                });
         this->reorder();
+        this->adjust();
     }
 
     template<typename T>
@@ -411,6 +418,7 @@ namespace Polynomial {
             return Monomial<T>(p.second, p.first);
         });
         this->reorder();
+        this->adjust();
     }
 
 
@@ -424,6 +432,7 @@ namespace Polynomial {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(p.second, p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -436,6 +445,7 @@ namespace Polynomial {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(std::move(p.second), p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -448,6 +458,7 @@ namespace Polynomial {
                                    n = std::max(n, p.first);
                                    return Monomial<T>(p.second, p.first);
                                });
+        this->adjust();
     }
 
     template<typename T>
@@ -459,6 +470,7 @@ namespace Polynomial {
             n = std::max(n, p.first);
             return Monomial<T>(std::move(p.second), p.first);
         });
+        this->adjust();
     }
 
     template<typename T>
