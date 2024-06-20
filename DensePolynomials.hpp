@@ -1,5 +1,5 @@
-#ifndef POLYNOMIALSHPC_POLYNOMIALS_HPP
-#define POLYNOMIALSHPC_POLYNOMIALS_HPP
+#ifndef POLYNOMIALSHPC_DENSEPOLYNOMIALS_HPP
+#define POLYNOMIALSHPC_DENSEPOLYNOMIALS_HPP
 
 #include "utils.hpp"
 #include <algorithm>
@@ -940,4 +940,4 @@ namespace Polynomial {
 
 } // namespace Polynomial
 
-#endif // POLYNOMIALSHPC_POLYNOMIALS_HPP
+#endif // POLYNOMIALSHPC_DENSEPOLYNOMIALS_HPP

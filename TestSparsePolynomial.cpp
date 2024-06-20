@@ -1,7 +1,7 @@
 // TestSparsePolynomial.cpp
 
 #include "SparsePolynomials.hpp"
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -30,19 +30,19 @@ int main() {
     /*
     * testing Sparse Polynomial implementation
     */
-    SparsePolynomial<int> basic;
+    Sparse<int> basic;
     cout << "default sparse polynomial: " << basic << endl;
 
     cout << "constructing V from vector" << endl;
     vector<double> vector1{6.3, 3, 0, 1, 5};
-    SparsePolynomial V(vector1);
+    Sparse V(vector1);
     cout << "V: " << V << endl;
     cout << "V.degree(): " << V.degree() << endl;
     cout << "Dominant monomial: " << V.dominant() << endl;
 
     cout << "constructing L from list<int>" << endl;
     list<int> list1{6, -3, 0, 1, 5};
-    SparsePolynomial L(list1);
+    Sparse L(list1);
     cout << "L: " << L << endl;
 
     cout << "constructing M from map<int,double>" << endl;
@@ -50,7 +50,7 @@ int main() {
     map1[17] = 15.3;
     map1[175] = -5;
     map1[0] = 777;
-    SparsePolynomial M(map1);
+    Sparse M(map1);
     cout << "M: " << M << endl;
 
     cout << "constructing U from unordered_map<int,double>" << endl;
@@ -58,13 +58,13 @@ int main() {
     umap1[17] = 1555.3;
     umap1[175] = -5555;
     umap1[0] = 777;
-    SparsePolynomial U(umap1);
+    Sparse U(umap1);
     cout << "U: " << U << endl;
 
     cout << "constructing U from Polynomial<double>" << endl;
     Dense poly1(vector1);
     cout << "dense version: " << poly1 << endl;
-    SparsePolynomial P(poly1);
+    Sparse P(poly1);
     cout << "Sparse version P: " << P << endl;
     cout << endl;
 
@@ -79,12 +79,12 @@ int main() {
     cout << "Testing 4th antiderivative P=" << P << endl;
     cout << endl;
 
-    SparsePolynomial<int> R;
+    Sparse<int> R;
     R.add({1, 5});
     R.add({1, 2});
     R.add({3, 0});
     cout << "R: " << R << endl;
-    SparsePolynomial<int> S;
+    Sparse<int> S;
     S.add({3, 3});
     S.add({-1, 0});
     cout << "S: " << S << endl;
@@ -99,7 +99,7 @@ int main() {
     auto Q = generateRandomIntPolynomial(100, 0, 1);
     cout << "Q and its degree: " << Q << ", " << Q.degree() << endl;
     cout << "Is Q sparse? " << Q.is_sparse() << endl;
-    SparsePolynomial Q_sparse(Q, true);
+    Sparse Q_sparse(Q, true);
     cout << "Q as sparse and its degree: " << Q_sparse << ", " << Q_sparse.degree() << endl;
 
     return 0;

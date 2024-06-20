@@ -78,7 +78,7 @@ inline int reverse(int num, int lg_n) {
 }
 
 inline void fft(std::vector<std::complex<double>> &a, bool invert) {
-    int n = a.size();
+    auto n = a.size();
     int lg_n = 0;
     while ((1 << lg_n) < n)
         lg_n++;
@@ -94,7 +94,8 @@ inline void fft(std::vector<std::complex<double>> &a, bool invert) {
         for (int i = 0; i < n; i += len) {
             std::complex<double> w(1);
             for (int j = 0; j < len / 2; j++) {
-                std::complex<double> u = a[i + j], v = a[i + j + len / 2] * w;
+                std::complex<double> u = a[i + j];
+                std::complex<double> v = a[i + j + len / 2] * w;
                 a[i + j] = u + v;
                 a[i + j + len / 2] = u - v;
                 w *= wlen;
@@ -109,7 +110,7 @@ inline void fft(std::vector<std::complex<double>> &a, bool invert) {
 }
 
 constexpr bool IsPowerOf2(const size_t value) {
-    return value && (!(value & (value - 1)));
+    return std::has_single_bit(value);
 }
 
 template<typename T>
@@ -119,7 +120,7 @@ inline void coutVect(std::ostream &os, const std::vector<T> &v) {
 
 class Timer {
     std::chrono::time_point<std::chrono::steady_clock> timePoint;
-    size_t value;
+    size_t value{};
 public:
     inline void start() { timePoint = std::chrono::steady_clock::now(); }
 

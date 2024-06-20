@@ -2,7 +2,7 @@
  * The goal here is to use either Karatsuba, FFT or brute force
  * multiplication whenever they are faster, depending on the input degrees
  */
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 #include "utils.hpp"
 #include <iostream>
 #include <vector>

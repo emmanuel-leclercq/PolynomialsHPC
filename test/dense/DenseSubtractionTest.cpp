@@ -1,7 +1,7 @@
 //
 // Created by Emmanuel Leclercq on 26/12/2023.
 //
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 
 #include "gtest/gtest.h"
 

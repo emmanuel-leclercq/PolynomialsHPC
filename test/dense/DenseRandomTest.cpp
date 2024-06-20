@@ -1,7 +1,7 @@
 //
 // Created by Emmanuel Leclercq on 26/12/2023.
 //
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 
 #include "gtest/gtest.h"
 
@@ -18,7 +18,6 @@ namespace {
 
     TEST(RandomTest, CustomGenerator) {
         std::random_device rd;
-        std::mt19937 mt_generator(rd());
         std::default_random_engine def_generator(rd());
         std::normal_distribution double_distribution(0.0, 1.0);
 

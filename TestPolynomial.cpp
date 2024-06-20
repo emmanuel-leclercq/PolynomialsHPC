@@ -1,6 +1,6 @@
 // TestPolynomial.cpp
 
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 #include <iostream>
 #include <vector>
 #include <chrono>

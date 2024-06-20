@@ -13,7 +13,7 @@
 #include <utility>
 #include <algorithm>
 #include "utils.hpp"
-#include "Polynomials.hpp"
+#include "DensePolynomials.hpp"
 
 namespace Polynomial {
 /*
@@ -242,8 +242,9 @@ namespace Polynomial {
          */
         template<std::integral n>
         Monomial<T> operator[](n i) const {
-            return *std::find_if(monomials.begin(), monomials.end(),
-                                 [i](const Monomial<T> &m) { return m.degree() == i; });
+            return *std::ranges::find_if(monomials, [i](const Monomial<T> &m) { return m.degree() == i; });
+//            return *std::find_if(monomials.begin(), monomials.end(),
+//                                 [i](const Monomial<T> &m) { return m.degree() == i; });
         }
 
         void derivative(int k = 1);
@@ -666,7 +667,7 @@ namespace Polynomial {
 
     template<typename T1, typename T2>
     Sparse<decltype(T1() * T2())> operator%(const Sparse<T1> &, const Sparse<T2> &) {
-
+        return Sparse<decltype(T1() * T2())>();
     }
 
     template<typename T1, typename T2>
