@@ -19,4 +19,7 @@ namespace {
         Dense<int> p3{{6, 3, 6, 4, 5, 1, 5}};
         EXPECT_EQ(p1 * p2, p3);
     }
+    TEST(MultiplicationTest, FFT){
+//        TODO
+    }
 }
