@@ -64,7 +64,7 @@ inline bool should_add_plus(const T &x) {
 }
 
 template<typename T>
-inline bool should_add_plus(const std::complex<T> &z) {
+inline bool should_add_plus(const std::complex<T> &) {
     return true;
 }
 
