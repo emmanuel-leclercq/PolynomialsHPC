@@ -338,7 +338,9 @@ namespace Polynomial {
 
     template<typename coeffType, typename precision = double>
     std::vector<precision> solveRealRoots(const Dense<coeffType> &P) {
-
+        /*
+         * TODO: check GSL implementation
+         */
         std::vector<precision> roots;
 
         if (P.degree() == 1) {
