@@ -104,8 +104,9 @@ inline void fft(std::vector<std::complex<double>> &a, bool invert) {
     }
 
     if (invert) {
-        for (auto &x: a)
+        for (auto &x: a) {
             x /= n;
+        }
     }
 }
 
