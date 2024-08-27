@@ -14,9 +14,9 @@ namespace {
         std::cout << "p[0]=" << p1[0] << " p[1]=" << p1[1] << " p[2]=" << p1[2] << std::endl;
         Dense<double> p2({2, 3}, true);
 
-        std::vector<int> Rootsp1 = solveRoots<int, int>(p1);
-        EXPECT_EQ(Rootsp1, v1);
-        std::vector<double> Rootsp2 = solveRoots<double, double>(p2);
+        std::vector<int> roots_p1 = solveRoots<int, int>(p1);
+        EXPECT_EQ(roots_p1, v1);
+        std::vector<double> roots_p2 = solveRoots<double, double>(p2);
 
 
     }

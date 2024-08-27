@@ -19,7 +19,7 @@ namespace {
                                              {1, 3},
                                              {0, 6},});
         Sparse p2(pv);
-        EXPECT_EQ(p1, p2); // implicit call to .reorder() and .adjust() removing null coeffs
+        EXPECT_EQ(p1, p2); // implicit call to .reorder() and .adjust() removing null coefficients
         Monomial<int> b({8, 8});
         p1.add(b);
         p1.reorder();
