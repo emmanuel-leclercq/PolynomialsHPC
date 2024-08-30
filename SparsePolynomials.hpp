@@ -99,9 +99,9 @@ namespace Polynomial {
     public:
         Monomial() : n(-1), coefficient(0) {}
 
-        Monomial(const T &a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
+        explicit Monomial(const T &a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
 
-        Monomial(const T &&a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
+        explicit Monomial(const T &&a, const int &m = 0) : n(m), coefficient(a) { if (a == 0) { n = -1; }}
 
         /*
          * Ordering by degree
