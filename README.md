@@ -1,7 +1,8 @@
 # PolynomialsHPC
 
 This is an attempt to build a headers-only high performance single-variable polynomial functions libraries,
-over any ring (the ring doesn't have to be compatible with the Fourier transform). The dense polynomial
+over any ring (the ring doesn't have to be compatible with the Fourier transform), but mostly for floats, real or
+complex, as there are many high performing libraries for integer polynomials out there. The dense polynomial
 class serves as a benchmark for the sparse polynomial class, which aims to achieve better memory performances.
 
 ### Polynomial (dense) class
@@ -10,7 +11,7 @@ This class represents polynomial coefficients as a vector, degrees are implied.
 We make heavy use of the <algorithm> and <numeric> libraries for efficiency.
 The adjust() method removes trailing zeros, basic accessors are provided.
 the is_sorted parameter is left to user to set for efficiency.
-Addition between non-ordered sparse polynomials results in a sorted sparse polynomial (no sorting overhead).
+Addition between non-ordered sparse polynomials results in a sorted sparse polynomial.
 
 #### Operations available :
 
@@ -33,7 +34,7 @@ Assuming t is the number of elements in the list representing a sparse polynomia
 complexity for most operations, which is not always possible. In fact, some operations are simply not possible,
 such as factorization (except for specific cases).
 
-#### Operations available
+#### Operations available:
 
 1. Addition
 2. Subtraction
@@ -45,4 +46,5 @@ such as factorization (except for specific cases).
 
 #### Resources
 
-Modern Computer Algebra, Gathen & Gerhard
+- Modern Computer Algebra, Gathen & Gerhard
+- Numerical Recipes, Press et al.
