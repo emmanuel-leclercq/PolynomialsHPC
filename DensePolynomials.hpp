@@ -75,7 +75,7 @@ namespace Polynomial {
         int n;
 
         //  extend method facilitates certain operations
-        [[nodiscard]] Dense extend(int) const;
+        [[maybe_unused]] [[nodiscard]] Dense extend(int) const;
 
         //  adjust removes trailing zeros
         void adjust();
@@ -652,7 +652,7 @@ namespace Polynomial {
     }
 
     template<typename T>
-    Dense<T> Dense<T>::extend(int m) const {
+    [[maybe_unused]] Dense<T> Dense<T>::extend(int m) const {
         if (m > n) {
             coefficients.reserve(m + 1);
         }
