@@ -80,13 +80,13 @@ int main() {
     cout << endl;
 
     Sparse<int> R;
-    R.add({1, 5});
-    R.add({1, 2});
-    R.add({3, 0});
+    R.add(Monomial<int>{1, 5});
+    R.add(Monomial<int>{1, 2});
+    R.add(Monomial<int>{3, 0});
     cout << "R: " << R << endl;
     Sparse<int> S;
-    S.add({3, 3});
-    S.add({-1, 0});
+    S.add(Monomial<int>{3, 3});
+    S.add(Monomial<int>{-1, 0});
     cout << "S: " << S << endl;
     cout << "R*S: " << R * S << endl;
 
